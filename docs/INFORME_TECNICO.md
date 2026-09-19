@@ -166,3 +166,154 @@ db.ventas_analiticas.find({
 - [x] Consultas analíticas optimizadas con benchmarking de latencia.
 - [x] Estrategia de indexación compuesta (O(N) -> O(log N)).
 - [x] Documentación técnica e informe arquitectónico completado.
+- [x] Pipeline de Integración y Entrega Continua (CI/CD) con GitHub Actions.
+- [x] Estrategia de Trunk-Based Development (TBD) con protección de rama `main` (Rulesets).
+- [x] Contenedorización con Docker y publicación automatizada en GitHub Container Registry (GHCR).
+
+---
+
+## 🚀 7. IMPLEMENTACIÓN DE CI/CD Y TRUNK-BASED DEVELOPMENT (TBD)
+
+### 7.1. Fundamentos y Filosofía de Trunk-Based Development
+En este proyecto se implementó el modelo de ramificación **Trunk-Based Development (TBD)**. A diferencia de modelos tradicionales con ramas de larga duración (como GitFlow), TBD promueve:
+- **Tronco Principal (`main`):** La rama `main` se mantiene en todo momento en un estado desplegable y estable (*always releasable*).
+- **Ramas Efímeras de Corta Duración (*Short-Lived Branches*):** Cualquier cambio, corrección o funcionalidad se desarrolla en ramas temporales (`test/*` o `feat/*`) cuya vida útil no supera unas pocas horas o un día.
+- **Validación Rápida y Fusión Frecuente:** El código se valida automáticamente mediante pipelines de CI antes de integrarse al tronco principal mediante Pull Requests pequeños y atómicos.
+
+```
+Trunk-Based Development Workflow:
+-------------------------------------------------------------------------------------
+[main] ────────────────●───────────────────────────────────● (Deploy GHCR) ─────────>
+                       \                                  /
+                        \                                / Pull Request + Status Checks (test)
+  [short-lived branch]   ●───────● (Commit & Push) ─────●
+                                 |
+                                 v
+                          [Job: test (ruff + pytest)]
+```
+
+---
+
+### 7.2. Pipeline de CI/CD en GitHub Actions (`.github/workflows/ci.yaml`)
+
+Se diseñó un pipeline modular dividido en **dos etapas (Jobs)** con el principio de separación de responsabilidades y mínimo privilegio:
+
+```yaml
+name: Test and Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run ruff linter
+        run: |
+          pip install ruff==0.8.1
+          ruff check .
+
+      - name: Run tests
+        run: |
+          pytest tests.py
+
+  build_and_push:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # <-- Permiso para subir a GHCR
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
+```
+
+#### Justificación Arquitectónica del Pipeline:
+1. **Job `test` (Feedback Inmediato):** Se ejecuta en **todos los Pull Requests** y pushes hacia cualquier rama vinculada. Realiza análisis estático de código con `ruff` y ejecuta la suite de pruebas unitarias (`pytest`). Si este job falla, la integración se bloquea de inmediato.
+2. **Job `build_and_push` (Despliegue Continuo Condicional):** Cuenta con la condición `needs: test` e `if: github.ref == 'refs/heads/main' && github.event_name == 'push'`. Solo se dispara cuando el código ha sido aprobado y fusionado en `main`, evitando compilar o subir imágenes Docker innecesarias provenientes de ramas secundarias o pruebas fallidas.
+3. **Mínimo Privilegio de Seguridad:** El permiso `packages: write` se configuró exclusivamente a nivel del job `build_and_push`, mientras que el job `test` opera únicamente con `contents: read`.
+
+---
+
+### 7.3. Suite de Pruebas Unitarias y Calidad de Código
+
+* **Pruebas Automatizadas ([`tests.py`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/tests.py)):** Se implementó una suite con `unittest.mock` para simular las respuestas del motor MongoDB Atlas, asegurando que las funciones críticas del sistema se validen de forma aislada y determinista sin requerir conectividad externa en el runner de CI.
+* **Control de Calidad y Linting ([`pyproject.toml`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/pyproject.toml)):** Se estandarizó el formato PEP 8 y se configuró el linter `ruff` para auditar la sintaxis, imports ordenados al inicio de archivo y eliminación de variables huérfanas en todos los módulos del repositorio.
+* **Contenedorización ([`Dockerfile`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/Dockerfile)):** Construcción ligera basada en `python:3.11-slim` que empaqueta la aplicación lista para su ejecución en entornos de producción y despliegue a GHCR.
+
+---
+
+### 7.4. Estrategia de Protección de Ramas (GitHub Rulesets)
+
+Para forzar el cumplimiento del flujo Trunk-Based Development, se configuró un **Ruleset / Branch Protection** en GitHub sobre la rama `main` con las siguientes políticas:
+
+| Regla Configurada | Objetivo / Impacto |
+| :--- | :--- |
+| **Require a pull request before merging** | Prohíbe los commits directos a `main`, forzando la creación de PRs y revisión formal. |
+| **Require status checks to pass (`test`)** | Exige que el job de análisis y pruebas (`test`) pase satisfactoriamente antes de permitir el merge. |
+| **Require branches to be up to date** | Garantiza que la rama secundaria contenga el último estado de `main` antes de integrarse. |
+| **Block force pushes** | Evita la sobreescritura destructiva o alteración del historial en el tronco principal. |
+| **Bypass List (Repository Admin)** | Permite al administrador del repositorio realizar la fusión documentada para mantener la fluidez operativa. |
+
+---
+
+### 7.5. Verificación Práctica y Evidencia de Ejecución
+
+1. **Creación de Rama de Verificación:**
+   ```bash
+   git checkout -b test/verificar-branch-protection
+   ```
+2. **Commit y Push:** Se introdujo un cambio controlado en `conexion.py` y se publicó la rama en GitHub.
+3. **Bloqueo y Aislamiento en Pull Request:**
+   - Al abrir el PR, GitHub activó el job `test` y omitió (*skipped*) el job `build_and_push`.
+   - La interfaz de GitHub bloqueó el botón de merge directo, validando el cumplimiento estricto del Ruleset.
+4. **Fusión y Limpieza (*Housekeeping*):**
+   - Se completó el merge a `main`.
+   - Se verificó el disparo automático de `build_and_push` publicando la imagen en `ghcr.io`.
+   - Se eliminó la rama efímera local y remotamente para mantener el repositorio limpio:
+     ```bash
+     git checkout main
+     git pull origin main
+     git branch -D test/verificar-branch-protection
+     git push origin --delete test/verificar-branch-protection
+     ```
+
