@@ -1,19 +1,9 @@
-from unittest.mock import MagicMock, patch
-from conexion import conectar_mongodb
+from main import Calculator
 
 
-def test_imports():
-    import conexion
-    assert hasattr(conexion, "conectar_mongodb")
+def test_sums_2_numbers():
+    assert Calculator().suma(2, 2) == 4
 
 
-@patch("conexion.pymongo.MongoClient")
-def test_conectar_mongodb_exitoso(mock_client):
-    mock_instance = MagicMock()
-    mock_instance.admin.command.return_value = {"ok": 1}
-    mock_client.return_value = mock_instance
-
-    client, db = conectar_mongodb()
-    assert client is not None
-    assert db is not None
-
+def test_resta_2_numbers():
+    assert Calculator().resta(5, 3) == 2
