@@ -1,17 +1,19 @@
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
 import os
+import random
+import sys
+import time
 import dns.resolver
+from dotenv import load_dotenv
+from faker import Faker
+import pymongo
+
+sys.stdout.reconfigure(encoding='utf-8')
+
 try:
     dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
     dns.resolver.default_resolver.nameservers = ['8.8.8.8', '1.1.1.1']
 except Exception:
     pass
-import random
-import pymongo
-from dotenv import load_dotenv
-from faker import Faker
-import time
 
 load_dotenv()
 
@@ -24,9 +26,11 @@ NUM_PRODUCTOS = 1000
 NUM_VENTAS = 50000
 BATCH_SIZE = 1000
 
+
 def conectar_bd():
     client = pymongo.MongoClient(MONGO_URI)
     return client["ventas_db"]
+
 
 def insertar_en_lotes(coleccion, datos, nombre_entidad):
     """Inserta datos en bloques, ignorando duplicados"""
@@ -35,7 +39,7 @@ def insertar_en_lotes(coleccion, datos, nombre_entidad):
     for i in range(0, total, BATCH_SIZE):
         lote = datos[i:i + BATCH_SIZE]
         try:
-            resultado = coleccion.insert_many(lote, ordered=False)
+            coleccion.insert_many(lote, ordered=False)
             progreso = min(i + BATCH_SIZE, total)
             print(f"  ➡️ Progreso: {progreso}/{total} ({(progreso/total)*100:.1f}%)")
         except pymongo.errors.BulkWriteError as e:
@@ -43,6 +47,7 @@ def insertar_en_lotes(coleccion, datos, nombre_entidad):
             progreso = min(i + BATCH_SIZE, total)
             print(f"  ⚠️ Progreso: {progreso}/{total} (Se omitieron {len(lote) - insertados} duplicados)")
     print(f"  ✅ Proceso de {nombre_entidad} finalizado.\n")
+
 
 def generar_datos():
     print("🚀 Iniciando generación de datos masivos para MongoDB Atlas...\n")
@@ -139,6 +144,7 @@ def generar_datos():
     print("=" * 50)
 
     db.client.close()
+
 
 if __name__ == "__main__":
     generar_datos()

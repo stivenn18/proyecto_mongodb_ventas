@@ -1,19 +1,22 @@
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
+from datetime import datetime
 import os
+import sys
 import dns.resolver
+from dotenv import load_dotenv
+import pymongo
+
+sys.stdout.reconfigure(encoding='utf-8')
+
 try:
     dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
     dns.resolver.default_resolver.nameservers = ['8.8.8.8', '1.1.1.1']
 except Exception:
     pass
-import pymongo
-from dotenv import load_dotenv
-from datetime import datetime
 
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
+
 
 def crear_estructura_ventas():
     client = pymongo.MongoClient(MONGO_URI)
@@ -105,6 +108,7 @@ def crear_estructura_ventas():
     print("🔍 Abre MongoDB Compass para ver las colecciones creadas.")
 
     client.close()
+
 
 if __name__ == "__main__":
     crear_estructura_ventas()

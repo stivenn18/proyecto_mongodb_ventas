@@ -16,3 +16,4 @@ def test_conectar_mongodb_exitoso(mock_client):
     client, db = conectar_mongodb()
     assert client is not None
     assert db is not None
+
