@@ -1,20 +1,23 @@
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
+import json
 import os
+import sys
+import time
 import dns.resolver
+from dotenv import load_dotenv
+import pymongo
+
+sys.stdout.reconfigure(encoding='utf-8')
+
 try:
     dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
     dns.resolver.default_resolver.nameservers = ['8.8.8.8', '1.1.1.1']
 except Exception:
     pass
-import pymongo
-from dotenv import load_dotenv
-import time
-import json
 
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
+
 
 def ejecutar_benchmark():
     print("🚀 Iniciando Benchmarking de Consultas Analíticas...\n")
@@ -105,6 +108,7 @@ def ejecutar_benchmark():
     print("=" * 70)
 
     client.close()
+
 
 if __name__ == "__main__":
     ejecutar_benchmark()

@@ -1,19 +1,22 @@
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
 import os
+import sys
+import time
 import dns.resolver
+from dotenv import load_dotenv
+import pymongo
+
+sys.stdout.reconfigure(encoding='utf-8')
+
 try:
     dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
     dns.resolver.default_resolver.nameservers = ['8.8.8.8', '1.1.1.1']
 except Exception:
     pass
-import pymongo
-from dotenv import load_dotenv
-import time
 
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
+
 
 def transformar_datos():
     print("🔄 Iniciando transformación de datos OLTP a OLAP (Modelo Estrella)...\n")
@@ -95,7 +98,7 @@ def transformar_datos():
     ]
 
     print("⚙️ Ejecutando Aggregation Pipeline...")
-    resultado = list(db.ventas.aggregate(pipeline, allowDiskUse=True))
+    list(db.ventas.aggregate(pipeline, allowDiskUse=True))
     tiempo_total = time.time() - inicio
     total_analitico = db.ventas_analiticas.count_documents({})
 
@@ -106,6 +109,7 @@ def transformar_datos():
     print("=" * 60)
 
     client.close()
+
 
 if __name__ == "__main__":
     transformar_datos()
