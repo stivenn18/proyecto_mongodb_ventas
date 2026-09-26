@@ -317,3 +317,153 @@ Para forzar el cumplimiento del flujo Trunk-Based Development, se configuró un 
      git push origin --delete test/verificar-branch-protection
      ```
 
+---
+
+## 💻 8. TALLER 2 — GESTIÓN DE FEATURES, GITHUB CLI (GH) Y DESARROLLO BASADO EN TRONCO
+
+### 8.1. Integración y Configuración de GitHub CLI (`gh`)
+Para acelerar los flujos de trabajo en Trunk-Based Development y evitar cambios constantes de contexto entre la terminal y la interfaz web, se integró la herramienta oficial **GitHub CLI (`gh`)**:
+- **Instalación y Verificación:** Se instaló mediante el gestor de paquetes de Windows (`winget install --id GitHub.cli`) y se verificó la versión activa (`gh --version`).
+- **Autenticación Segura (OAuth HTTPS):** Se vinculó la cuenta de GitHub con autenticación basada en navegador web (`gh auth login`), otorgando permisos sobre repositorios (`repo`), flujos de trabajo (`workflow`) y proyectos (`project`).
+- **Comprobación de Estado:** Validación de credenciales y repositorio activo con:
+  ```bash
+  gh auth status
+  gh repo view stivenn18/proyecto_mongodb_ventas
+  ```
+
+---
+
+### 8.2. Desglose y Creación Automatizada de Issues (Sprint Planning)
+Se implementó la descomposición de requerimientos en **3 Issues atómicos** creados directamente desde la CLI, aplicando criterios de aceptación y la técnica de **Feature Toggles (Banderas de Características)**:
+
+| # Issue | Título de la Tarea | Alcance y Criterio de Aceptación |
+| :---: | :--- | :--- |
+| **Issue 1** | `feat: agregar método resta() a Calculator con toggle de feature desactivado` | Implementar lógica de resta en `Calculator` con test unitario en `tests.py`. Desactivado por feature flag (rollout 0%). |
+| **Issue 2** | `feat: exponer resta() en el frontend detrás del toggle (rollout interno)` | Conectar `script.js` e `index.html` al endpoint de resta, visible condicionalmente (rollout 10%). |
+| **Issue 3** | `feat: multiplicación, división e historial + encender toggle al 100%` | Completar operaciones aritméticas restantes, persistencia de historial y activación total del feature flag al 100%. |
+
+---
+
+### 8.3. Implementación de la Feature 1 con Trunk-Based Development
+
+Siguiendo el ciclo de vida de ramas de corta duración (*Short-Lived Feature Branches*):
+
+#### 1. Creación de la Rama Efímera:
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/resta-calculator
+```
+
+#### 2. Desarrollo del Módulo Principal ([`main.py`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/main.py)):
+Se implementó la clase `Calculator` incorporando los métodos matemáticos tipados:
+```python
+class Calculator:
+    def suma(self, a: int, b: int) -> int:
+        return a + b
+
+    def resta(self, a: int, b: int) -> int:
+        return a - b
+```
+
+#### 3. Suite de Pruebas Unitarias ([`tests.py`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/tests.py)):
+Se añadieron las aserciones de prueba correspondientes para garantizar cobertura total de la nueva función:
+```python
+from main import Calculator
+
+
+def test_sums_2_numbers():
+    assert Calculator().suma(2, 2) == 4
+
+
+def test_resta_2_numbers():
+    assert Calculator().resta(5, 3) == 2
+```
+
+#### 4. Control de Versiones y Publicación:
+```bash
+git add main.py tests.py
+git commit -m "feat: agregar método resta() a Calculator con su test"
+git push origin feature/resta-calculator
+```
+
+---
+
+### 8.4. Creación de Pull Request y Verificación de CI con `gh`
+
+1. **Apertura de Pull Request desde Terminal:**
+   ```bash
+   gh pr create --title "feat: agregar método resta() a Calculator con su test" \
+                --body "Implementa resta en Calculator con sus pruebas unitarias. Closes #1"
+   ```
+2. **Inspección de Checks en Tiempo Real:**
+   ```bash
+   gh pr checks
+   ```
+   *Resultado:* El job de integración continua `test` ejecutó el linter (`ruff`) y las pruebas (`pytest`), reportando estado exitoso (**`All checks were successful`** ✅).
+3. **Revisión Web y Estrategia de Merge:**
+   ```bash
+   gh pr view --web
+   ```
+   * Se revisó el diff de cambios y se completó la fusión mediante **Squash and Merge**, condensando la feature en un único commit limpio en el historial del tronco principal.
+
+---
+
+### 8.5. Sincronización y Limpieza de Ramas (*Housekeeping*)
+
+Para prevenir acumulación de ramas huérfanas en el repositorio, se procedió a la sincronización y eliminación inmediata de la rama de trabajo:
+
+```bash
+# 1. Volver al tronco principal y descargar la integración
+git checkout main
+git pull origin main
+
+# 2. Eliminar la rama localmente
+git branch -D feature/resta-calculator
+
+# 3. Eliminar la rama en el repositorio remoto
+git push origin --delete feature/resta-calculator
+```
+
+---
+
+## 📈 9. TALLER 4 — BACKLOG Y PLANIFICACIÓN DE SPRINTS CON ENTREGAS INCREMENTALES
+
+### 9.1. Diagnóstico de Salud del Backlog (Los 4 Criterios TBD)
+Se evaluaron todos los ítems del Product Backlog mediante los 4 filtros de entrega continua:
+1. **Tamaño ($\le 1$ día):** Capacidad de integrarse a `main` en menos de 24 horas.
+2. **Verticalidad:** Atraviesa las capas de la aplicación y entrega valor verificable.
+3. **Feature Toggle:** Presencia y definición del flag técnico para aislar el cambio en producción.
+4. **Validación en Producción:** Criterios de Aceptación medibles tras el despliegue.
+
+* **Resultado del Diagnóstico:** Las historias #1 y #2 fueron clasificadas en 🟢 **Listas para TBD**, mientras que la historia #3 fue clasificada en 🔴 **Demasiado grande / Requiere re-sliceado vertical**.
+
+---
+
+### 9.2. Aplicación de Técnicas de Sliceado Vertical (Re-Slicing de Historia #3)
+Se dividió la historia compleja en 3 micro-incrementos atómicos e independientes:
+- **Slice 3.1 (Lógica de Negocio):** Métodos `multiplicacion()` y `division()` con `FLAG_OP_AVANZADAS = False` (Rollout al 0%).
+- **Slice 3.2 (Persistencia):** Colección `historial_calculos` en MongoDB Atlas con `FLAG_HISTORIAL_AUDITORIA = False`.
+- **Slice 3.3 (UI & Retiro de Deuda):** Interfaz visual interactiva, activación al 100% y depuración de código de toggles.
+
+---
+
+### 9.3. Planificación de Sprint Orientada a Flujo Diario
+- **Sprint Goal con TBD:** *"Al final del sprint, los usuarios podrán realizar cálculos aritméticos completos (suma, resta, multiplicación, división) y auditar su historial en MongoDB, aunque la vista gráfica avanzada del historial permanezca oculta tras un Feature Flag al 10% para beta-testers."*
+- **Cronograma de Integración Diaria:**
+  - **Día 1–2:** Integración a `main` de Slice 1 (Resta) y Slice 3.1 (Multiplicación/División).
+  - **Día 3–4:** Integración a `main` de Slice 2 (UI de resta) y Slice 3.2 (Persistencia en MongoDB).
+  - **Día 5+:** Integración a `main` de Slice 3.3 (UI completa + historial), pruebas E2E y retiro de toggles.
+- **Capacidad Realista:** Reserva del 25% de buffer técnico para Code Reviews (<30 min), CI checks y salud de `main`.
+
+---
+
+### 9.4. Definition of Ready (DoR) Formalizado
+Se establecieron los 5 acuerdos obligatorios para que una historia ingrese a Planning:
+1. Sliceado para integrarse en $\le 1$ día de trabajo.
+2. Criterios de Aceptación medibles una vez desplegado.
+3. Feature Toggle definido (variable y estado 0%).
+4. Cero dependencias bloqueantes externas.
+5. El equipo comprende la estrategia de pruebas unitarias.
+
+
