@@ -2,8 +2,7 @@
 ## Adaptación de Scrum a entornos de Despliegue Continuo (CD) y Trunk-Based Development
 **Proyecto:** Sistema de Ventas con MongoDB Atlas & Python  
 **Repositorio:** `stivenn18/proyecto_mongodb_ventas`  
-**Fecha:** 2026-09-26  
-**Nivel:** Profesional / Guía de Equipo  
+
 
 ---
 
