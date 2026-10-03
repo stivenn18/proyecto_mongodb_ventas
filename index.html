@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda MongoDB Ventas - E-Commerce con Wishlist (TBD)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Encabezado de la tienda -->
+  <header class="navbar">
+    <div class="logo">
+      <h1>🛍️ VentasStore <span class="badge-tech">MongoDB Atlas + TBD</span></h1>
+    </div>
+    <div class="nav-actions">
+      <div class="user-pill">👤 Cliente: <strong id="currentClient">CLI001 (Juan Pérez)</strong></div>
+      <!-- Ticket 3: Botón de acceso a Mi Lista de Deseos -->
+      <button class="btn-wishlist-header" id="btnHeaderWishlist" onclick="abrirModalWishlist()">
+        ❤️ Mi Lista de Deseos (<span id="wishlistCount">0</span>)
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="banner-info">
+      <h2>Catálogo de Productos Oficial</h2>
+      <p>Explora los productos transaccionales integrados en el sistema de ventas.</p>
+    </section>
+
+    <!-- Panel de Control de Feature Flags (Simulación ConfigCat/LaunchDarkly) -->
+    <div class="toggle-control-panel">
+      <div class="panel-header">
+        <h4>⚙️ Panel de Feature Flags (Trunk-Based Development):</h4>
+        <span class="flag-status" id="flagStatusBadge">Estado: 10% Rollout (Canary)</span>
+      </div>
+      <div class="flags-options">
+        <label>
+          <input type="radio" name="flagRollout" value="0" onchange="cambiarRollout(0)">
+          🔴 <strong>0% Rollout (OFF):</strong> Flag apagado en producción (Ticket 1).
+        </label>
+        <label>
+          <input type="radio" name="flagRollout" value="10" checked onchange="cambiarRollout(10)">
+          🟡 <strong>10% Rollout (Canary/Beta):</strong> Botón "❤️ Guardar" visible para testers (Ticket 2).
+        </label>
+        <label>
+          <input type="radio" name="flagRollout" value="100" onchange="cambiarRollout(100)">
+          🟢 <strong>100% Rollout (ON):</strong> Funcionalidad disponible para todos los usuarios (Ticket 3).
+        </label>
+      </div>
+    </div>
+
+    <!-- Cuadrícula de Productos -->
+    <div class="products-grid" id="productsGrid">
+      <!-- Los productos se inyectan dinámicamente -->
+    </div>
+  </main>
+
+  <!-- Ticket 3: Modal de Mi Lista de Deseos (Wishlist View) -->
+  <div class="modal-overlay" id="wishlistModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>❤️ Mi Lista de Deseos (<span id="modalWishlistCount">0</span>)</h3>
+        <button class="btn-close" onclick="cerrarModalWishlist()">✖</button>
+      </div>
+      <div class="modal-body" id="wishlistItemsContainer">
+        <!-- Ítems de la lista de deseos -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModalWishlist()">Seguir Comprando</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
