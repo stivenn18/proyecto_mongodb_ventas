@@ -1,5 +1,25 @@
 import pytest
+from fastapi.testclient import TestClient
+from app import app
 from wishlist import WishlistService
+
+client = TestClient(app)
+
+
+def test_health_check_endpoint():
+    """Validar que el endpoint /health responde con status healthy para Render"""
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert data["service"] == "ventas-wishlist-api"
+
+
+def test_api_flags_endpoint():
+    """Validar consulta de Feature Flags"""
+    response = client.get("/api/flags")
+    assert response.status_code == 200
+    assert "wishlist_enabled" in response.json()
 
 
 def test_wishlist_flag_desactivado():
@@ -22,7 +42,7 @@ def test_wishlist_flag_activo_agregar():
     }
     resultado = service.agregar_producto_deseo("CLI001", producto)
     assert resultado["status"] == "success"
-    
+
     deseos = service.obtener_deseos("CLI001")
     assert len(deseos) == 1
     assert deseos[0]["sku"] == "PROD001"

@@ -264,3 +264,69 @@ Ninguna historia de usuario puede ingresar al **Sprint Backlog** si no cumple co
 ### 💬 Pregunta de Cierre: *¿Qué cambia en nuestra próxima Planning después de este taller?*
 > **Conclusión:** *Cambia el paradigma de planificación: dejamos de planificar "bloques gigantescos de trabajo que se prueban al final de 2 semanas" y pasamos a planificar una **secuencia ordenada de micro-integraciones diarias**. El Sprint Planning se convierte en una sesión de diseño de Feature Flags y aseguramiento del DoR, garantizando que el tronco principal (`main`) reciba valor desde el primer día.*
 
+---
+
+## 🚀 11. CI/CD ROBUSTO, AUTO-DEPLOY A RENDER Y GOBERNANZA DE CONFIGCAT (TALLER 3)
+
+### 11.1. Auto-Deploy desde `main` a Render
+Se implementó el despliegue continuo mediante infraestructura como código ([`render.yaml`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/render.yaml)) y la API web en FastAPI ([`app.py`](file:///c:/Users/stive/Downloads/proyecto_mongodb_ventas/app.py)):
+
+* **Repositorio Vinculado:** `stivenn18/proyecto_mongodb_ventas`
+* **Rama de Producción:** `main` (Despliegue 100% automatizado tras merge).
+* **Build Command:** `pip install -r requirements.txt`
+* **Start Command:** `uvicorn app:app --host 0.0.0.0 --port $PORT`
+* **Health Check Endpoint:** `/health` (Monitorea el estado `{ "status": "healthy", "service": "ventas-wishlist-api" }`).
+* **Variables de Entorno:** `CONFIGCAT_SDK_KEY`, `MONGO_URI`, `ENVIRONMENT=production`.
+
+---
+
+### 11.2. Integración de ConfigCat SDK y Acuerdos de Gobernanza
+Se integró el SDK oficial de **ConfigCat** (`configcat-client`) para gestionar los Feature Flags de forma remota sin requerir redespliegues de código:
+
+```
++-----------------------------------------------------------------------------------------+
+|                  CICLO DE VIDA DEL FEATURE TOGGLE (WISHLIST E-COMMERCE)                 |
++-------------------+-----------------------------------+---------------------------------+
+| ESTADO DEL TOGGLE | COMPORTAMIENTO OBSERVADO          | AUDIENCIA OBJETIVO              |
++-------------------+-----------------------------------+---------------------------------+
+| 🔴 OFF (0%)       | Botón "❤️ Guardar" y modal oculto | Código desplegado e inactivo.   |
+| 🟡 CANARY (10%)   | Visible solo para Beta-Testers    | Validación real de feedback.    |
+| 🟢 ON (100%)      | Funcionalidad 100% pública        | Todos los usuarios de la tienda.|
++-------------------+-----------------------------------+---------------------------------+
+```
+
+#### Acuerdos de Gobernanza de Feature Flags:
+1. **Responsable de Activación:** El *Product Owner (PO)* junto al equipo técnico decide el momento de avance de rollout (0% ➔ 10% ➔ 100%).
+2. **Fecha de Limpieza Obligatoria (*Toggle Debt*):** Todo flag activado al 100% debe ser retirado del código en un plazo máximo de 1 Sprint para evitar deuda técnica acumulada.
+
+---
+
+### 11.3. Definition of Done (DoD) Versión Final (3 Dimensiones)
+
+El **Definition of Done definitivo** acordado por el equipo cubre las 3 dimensiones indispensables para el flujo TBD:
+
+```
++-----------------------------------------------------------------------------------------+
+|                    DEFINITION OF DONE (DoD) FINAL - VERSIÓN OFICIAL                     |
++----------------------------+----------------------------+-------------------------------+
+| ⚙️ DOD TÉCNICO             | 💼 DOD DE NEGOCIO          | 🚀 DOD DE DESPLIEGUE          |
++----------------------------+----------------------------+-------------------------------+
+| • Código revisado en PR.   | • Acceptance Criteria      | • Auto-desplegado en Render   |
+| • CI en verde (Pytest+Ruff)|   cumplidos al 100%.       |   desde main.                 |
+| • Imagen Docker en GHCR.   | • Validable en producción. | • Health check /health en OK. |
+| • Feature Toggle probado.  | • PO conoce el estado del  | • Logs y métricas sin errores.|
+| • Cero regresiones.        |   Toggle (OFF/10%/100%).   | • Toggle en estado acordado.  |
++----------------------------+----------------------------+-------------------------------+
+```
+
+---
+
+## 🏆 12. CIERRE FORMAL DE FASE 1 (CHECKLIST CUMPLIDO)
+
+- [x] Auto-deploy desde `main` a **Render** configurado y validado con `/health`.
+- [x] Feature Toggle con **ConfigCat** operativo para el Ejemplo 1 (*Wishlist E-Commerce*).
+- [x] Suite de pruebas unitarias robusta con 100% de cobertura y `ruff linter` aprobado.
+- [x] Definition of Done (DoD) definitivo documentado y aplicado.
+- [x] Repositorio `main` protegido con Rulesets y operando bajo Trunk-Based Development real.
+
+
