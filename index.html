@@ -3,73 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tienda MongoDB Ventas - E-Commerce con Wishlist (TBD)</title>
+  <title>VentasStore Pro · E-Commerce & ConfigCat Live Toggles (TBD)</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- ConfigCat JS SDK oficial via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/configcat-js@latest/dist/configcat.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Encabezado de la tienda -->
-  <header class="navbar">
-    <div class="logo">
-      <h1>🛍️ VentasStore <span class="badge-tech">MongoDB Atlas + TBD</span></h1>
+
+  <!-- Barra de Notificación en Vivo de ConfigCat Cloud -->
+  <aside class="cloud-statusbar">
+    <div class="statusbar-content">
+      <span class="live-dot pulse"></span>
+      <span><strong>ConfigCat Cloud:</strong> Conectado en tiempo real</span>
+      <span class="divider">|</span>
+      <span><strong>Flag:</strong> <code id="flagKeyLabel">wishlist_enabled</code></span>
+      <span class="divider">|</span>
+      <span><strong>Estado Cloud:</strong> <span class="status-badge" id="cloudFlagBadge">Consultando...</span></span>
     </div>
-    <div class="nav-actions">
-      <div class="user-pill">👤 Cliente: <strong id="currentClient">CLI001 (Juan Pérez)</strong></div>
-      <!-- Ticket 3: Botón de acceso a Mi Lista de Deseos -->
-      <button class="btn-wishlist-header" id="btnHeaderWishlist" onclick="abrirModalWishlist()">
-        ❤️ Mi Lista de Deseos (<span id="wishlistCount">0</span>)
+    <div class="statusbar-actions">
+      <button class="btn-refresh" onclick="forzarSincronizacionCloud()" title="Forzar Sincronización">
+        <i class="fa-solid fa-arrows-rotate"></i> Sincronizar
       </button>
+    </div>
+  </aside>
+
+  <!-- Navbar Principal -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-store"></i></div>
+        <div>
+          <h1>VentasStore <span class="badge-pro">TBD Pro</span></h1>
+          <span class="logo-sub">MongoDB Atlas · CI/CD · Render</span>
+        </div>
+      </div>
+
+      <div class="search-bar-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar laptops, monitores, accesorios..." oninput="filtrarProductos()">
+      </div>
+
+      <div class="nav-actions">
+        <div class="user-pill">
+          <i class="fa-solid fa-user-check"></i>
+          <span>CLI001 <strong>(Juan Pérez)</strong></span>
+        </div>
+
+        <!-- Botón de Wishlist (Controlado por ConfigCat Feature Flag) -->
+        <button class="btn-wishlist-header" id="btnHeaderWishlist" style="display: none;" onclick="abrirModalWishlist()">
+          <i class="fa-solid fa-heart"></i>
+          <span>Mi Lista de Deseos</span>
+          <span class="wishlist-badge" id="wishlistCount">0</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    <section class="banner-info">
-      <h2>Catálogo de Productos Oficial</h2>
-      <p>Explora los productos transaccionales integrados en el sistema de ventas.</p>
+  <!-- Contenido Principal -->
+  <main class="main-container">
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-text">
+        <h2>Catálogo de Ventas Oficial &middot; Entrega Continua</h2>
+        <p>Integración de base de datos distribuida en MongoDB Atlas con Feature Toggles remotos en producción.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <i class="fa-solid fa-database"></i>
+          <div>
+            <strong>149,655</strong>
+            <span>Ventas en Atlas</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-code-merge"></i>
+          <div>
+            <strong>Trunk-Based</strong>
+            <span>Continuous Deploy</span>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Panel de Control de Feature Flags (Simulación ConfigCat/LaunchDarkly) -->
-    <div class="toggle-control-panel">
-      <div class="panel-header">
-        <h4>⚙️ Panel de Feature Flags (Trunk-Based Development):</h4>
-        <span class="flag-status" id="flagStatusBadge">Estado: 10% Rollout (Canary)</span>
+    <!-- Panel Interactivo de Demostración de Feature Flags -->
+    <section class="feature-flag-card">
+      <div class="flag-card-header">
+        <div class="flag-title">
+          <i class="fa-solid fa-sliders"></i>
+          <h3>Control de Feature Flags (Demostración en Vivo)</h3>
+        </div>
+        <div class="flag-mode-indicator" id="flagModeIndicator">
+          <i class="fa-solid fa-cloud"></i> Modo: <strong>ConfigCat Cloud API</strong>
+        </div>
       </div>
-      <div class="flags-options">
-        <label>
-          <input type="radio" name="flagRollout" value="0" onchange="cambiarRollout(0)">
-          🔴 <strong>0% Rollout (OFF):</strong> Flag apagado en producción (Ticket 1).
-        </label>
-        <label>
-          <input type="radio" name="flagRollout" value="10" checked onchange="cambiarRollout(10)">
-          🟡 <strong>10% Rollout (Canary/Beta):</strong> Botón "❤️ Guardar" visible para testers (Ticket 2).
-        </label>
-        <label>
-          <input type="radio" name="flagRollout" value="100" onchange="cambiarRollout(100)">
-          🟢 <strong>100% Rollout (ON):</strong> Funcionalidad disponible para todos los usuarios (Ticket 3).
-        </label>
+
+      <p class="flag-explainer">
+        Esta funcionalidad está protegida en producción. Si cambias el interruptor en el 
+        <a href="https://app.configcat.com" target="_blank" class="link-configcat">Dashboard de ConfigCat <i class="fa-solid fa-arrow-up-right-from-square"></i></a>, 
+        la tienda habilitará o deshabilitará la lista de deseos <strong>automáticamente en tiempo real sin necesidad de redesplegar</strong>.
+      </p>
+
+      <div class="flag-simulation-controls">
+        <span class="control-label">Simular estado localmente (o ver remoto):</span>
+        <div class="segmented-control">
+          <button class="seg-btn" id="segBtnOff" onclick="aplicarSimulacionManual(false)">🔴 Forzar OFF (0%)</button>
+          <button class="seg-btn active" id="segBtnCloud" onclick="usarConfigCatCloud()">☁️ Usar ConfigCat Cloud</button>
+          <button class="seg-btn" id="segBtnOn" onclick="aplicarSimulacionManual(true)">🟢 Forzar ON (100%)</button>
+        </div>
       </div>
+    </section>
+
+    <!-- Filtros por Categoría -->
+    <div class="categories-bar">
+      <button class="cat-pill active" onclick="filtrarCategoria('Todas', this)">Todas</button>
+      <button class="cat-pill" onclick="filtrarCategoria('Electrónica', this)">💻 Electrónica</button>
+      <button class="cat-pill" onclick="filtrarCategoria('Audio', this)">🎧 Audio</button>
+      <button class="cat-pill" onclick="filtrarCategoria('Monitores', this)">🖥️ Monitores</button>
+      <button class="cat-pill" onclick="filtrarCategoria('Accesorios', this)">⌨️ Accesorios</button>
+      <button class="cat-pill" onclick="filtrarCategoria('Muebles', this)">🪑 Muebles</button>
     </div>
 
-    <!-- Cuadrícula de Productos -->
-    <div class="products-grid" id="productsGrid">
-      <!-- Los productos se inyectan dinámicamente -->
-    </div>
+    <!-- Grilla de Productos -->
+    <section class="products-grid" id="productsGrid">
+      <!-- Inyección dinámica -->
+    </section>
+
   </main>
 
-  <!-- Ticket 3: Modal de Mi Lista de Deseos (Wishlist View) -->
-  <div class="modal-overlay" id="wishlistModal" style="display: none;">
-    <div class="modal-content">
+  <!-- Modal / Drawer de Mi Lista de Deseos (Ticket 3) -->
+  <div class="modal-backdrop" id="wishlistModal" style="display: none;" onclick="cerrarModalFuera(event)">
+    <div class="modal-dialog">
       <div class="modal-header">
-        <h3>❤️ Mi Lista de Deseos (<span id="modalWishlistCount">0</span>)</h3>
-        <button class="btn-close" onclick="cerrarModalWishlist()">✖</button>
+        <div class="modal-title">
+          <i class="fa-solid fa-heart" style="color: #e11d48;"></i>
+          <h3>Mi Lista de Deseos</h3>
+          <span class="modal-count-pill" id="modalWishlistCount">0 productos</span>
+        </div>
+        <button class="btn-close-modal" onclick="cerrarModalWishlist()"><i class="fa-solid fa-xmark"></i></button>
       </div>
+
       <div class="modal-body" id="wishlistItemsContainer">
-        <!-- Ítems de la lista de deseos -->
+        <!-- Ítems agregados dinámicamente -->
       </div>
+
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="cerrarModalWishlist()">Seguir Comprando</button>
+        <button class="btn btn-outline" onclick="cerrarModalWishlist()">Seguir Explorando</button>
+        <button class="btn btn-checkout" onclick="comprarWishlistCompleta()">
+          <i class="fa-solid fa-cart-shopping"></i> Comprar Todo (<span id="totalWishlistAmount">$0</span>)
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- Toast de Notificaciones Flotantes -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <script src="script.js"></script>
 </body>
