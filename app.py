@@ -70,8 +70,26 @@ def get_index():
     """Servir la interfaz gráfica de la tienda e-commerce"""
     index_path = os.path.join(os.path.dirname(__file__), "index.html")
     if os.path.exists(index_path):
-        return FileResponse(index_path)
+        return FileResponse(index_path, media_type="text/html")
     return {"mensaje": "API de Ventas & Wishlist en ejecución en Render"}
+
+
+@app.get("/style.css")
+def get_style():
+    """Servir la hoja de estilos CSS"""
+    style_path = os.path.join(os.path.dirname(__file__), "style.css")
+    if os.path.exists(style_path):
+        return FileResponse(style_path, media_type="text/css")
+    raise HTTPException(status_code=404, detail="style.css not found")
+
+
+@app.get("/script.js")
+def get_script():
+    """Servir el archivo JavaScript con la lógica y ConfigCat SDK"""
+    script_path = os.path.join(os.path.dirname(__file__), "script.js")
+    if os.path.exists(script_path):
+        return FileResponse(script_path, media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="script.js not found")
 
 
 @app.get("/health")

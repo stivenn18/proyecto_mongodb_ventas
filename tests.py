@@ -6,6 +6,20 @@ from wishlist import WishlistService
 client = TestClient(app)
 
 
+def test_index_and_static_files():
+    """Validar que index.html, style.css y script.js se sirvan correctamente para Render"""
+    r_index = client.get("/")
+    assert r_index.status_code == 200
+
+    r_css = client.get("/style.css")
+    assert r_css.status_code == 200
+    assert "text/css" in r_css.headers["content-type"]
+
+    r_js = client.get("/script.js")
+    assert r_js.status_code == 200
+    assert "javascript" in r_js.headers["content-type"]
+
+
 def test_health_check_endpoint():
     """Validar que el endpoint /health responde con status healthy para Render"""
     response = client.get("/health")
