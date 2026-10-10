@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VentasStore Pro · E-Commerce & ConfigCat Live Toggles (TBD)</title>
+  <title>VentasStore · Tienda Oficial de Tecnología y Equipos de Alto Rendimiento</title>
   <!-- Google Fonts & Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -839,22 +839,102 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-</style>
+/* Footer Corporativo */
+.site-footer {
+  background: #0f172a;
+  color: #94a3b8;
+  margin-top: 60px;
+  border-top: 1px solid #1e293b;
+  padding: 40px 24px 20px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 32px;
+}
+
+.footer-brand h4 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.footer-brand p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #64748b;
+  max-width: 320px;
+}
+
+.footer-col h5 {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-col ul {
+  list-style: none;
+}
+
+.footer-col ul li {
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+}
+
+.footer-col ul li a {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-col ul li a:hover {
+  color: #ffffff;
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}
+
+  </style>
 </head>
 <body>
 
-  <!-- Barra de Notificación en Vivo de ConfigCat Cloud -->
+  <!-- Barra Superior de Conectividad Cloud -->
   <aside class="cloud-statusbar">
     <div class="statusbar-content">
       <span class="live-dot pulse"></span>
-      <span><strong>ConfigCat Cloud:</strong> Conectado</span>
+      <span><strong>Servicio Cloud:</strong> Conectado en Tiempo Real</span>
       <span class="divider">|</span>
-      <span><strong>Flag 1:</strong> <code>wishlist_enabled</code>: <span class="status-badge" id="cloudFlagBadge">Consultando...</span></span>
+      <span><strong>Función 1:</strong> <code>wishlist_enabled</code>: <span class="status-badge" id="cloudFlagBadge">Consultando...</span></span>
       <span class="divider">|</span>
-      <span><strong>Flag 2 (Taller 6):</strong> <code>pagos-express-v1</code>: <span class="status-badge off" id="cloudPagosBadge">OFF (0%)</span></span>
+      <span><strong>Función 2:</strong> <code>pagos-express-v1</code>: <span class="status-badge off" id="cloudPagosBadge">OFF (0%)</span></span>
     </div>
     <div class="statusbar-actions">
-      <button class="btn-refresh" onclick="forzarSincronizacionCloud()" title="Forzar Sincronización">
+      <button class="btn-refresh" onclick="forzarSincronizacionCloud()" title="Sincronizar con el Servidor">
         <i class="fa-solid fa-arrows-rotate"></i> Sincronizar
       </button>
     </div>
@@ -866,20 +946,20 @@ body {
       <div class="logo">
         <div class="logo-icon"><i class="fa-solid fa-store"></i></div>
         <div>
-          <h1>VentasStore <span class="badge-pro">TBD Pro</span></h1>
-          <span class="logo-sub">MongoDB Atlas · CI/CD · Render</span>
+          <h1>VentasStore <span class="badge-pro">Oficial</span></h1>
+          <span class="logo-sub">Tecnología &bull; Hardware &bull; Despacho Inmediato</span>
         </div>
       </div>
 
       <div class="search-bar-container">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" id="searchInput" placeholder="Buscar laptops, monitores, accesorios..." oninput="filtrarProductos()">
+        <input type="text" id="searchInput" placeholder="Buscar laptops, monitores, periféricos..." oninput="filtrarProductos()">
       </div>
 
       <div class="nav-actions">
         <div class="user-pill">
           <i class="fa-solid fa-user-check"></i>
-          <span>CLI001 <strong>(Juan Pérez)</strong></span>
+          <span>Cliente Activo: <strong>Juan Pérez</strong></span>
         </div>
 
         <!-- Botón de Wishlist (Controlado por ConfigCat Feature Flag) -->
@@ -895,62 +975,60 @@ body {
   <!-- Contenido Principal -->
   <main class="main-container">
 
-    <!-- Hero Banner -->
+    <!-- Hero Banner Premium -->
     <section class="hero-banner">
       <div class="hero-text">
-        <h2>Catálogo de Ventas Oficial &middot; Entrega Continua</h2>
-        <p>Integración de base de datos distribuida en MongoDB Atlas con Feature Toggles remotos en producción (Taller 3 y 6).</p>
+        <h2>Equípate con lo Último en Tecnología y Alto Rendimiento</h2>
+        <p>Catálogo oficial de computadores de última generación, periféricos profesionales y sonido de alta fidelidad con garantía directa.</p>
       </div>
       <div class="hero-stats">
         <div class="stat-card">
-          <i class="fa-solid fa-database"></i>
+          <i class="fa-solid fa-shield-halved"></i>
           <div>
-            <strong>149,655</strong>
-            <span>Ventas en Atlas</span>
+            <strong>100% Garantía</strong>
+            <span>Respaldo y Cobertura Total</span>
           </div>
         </div>
         <div class="stat-card">
-          <i class="fa-solid fa-code-merge"></i>
+          <i class="fa-solid fa-truck-fast"></i>
           <div>
-            <strong>Trunk-Based</strong>
-            <span>Continuous Deploy</span>
+            <strong>Envíos Rápidos</strong>
+            <span>Despacho Nacional Seguro</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Panel Interactivo de Demostración de Feature Flags -->
+    <!-- Panel de Preferencias y Funcionalidades Dinámicas -->
     <section class="feature-flag-card">
       <div class="flag-card-header">
         <div class="flag-title">
           <i class="fa-solid fa-sliders"></i>
-          <h3>Control de Feature Flags (Demostración Taller 3 & 6 en Vivo)</h3>
+          <h3>Panel de Funcionalidades Dinámicas (Feature Toggles)</h3>
         </div>
         <div class="flag-mode-indicator" id="flagModeIndicator">
-          <i class="fa-solid fa-cloud"></i> Modo: <strong>ConfigCat Cloud API</strong>
+          <i class="fa-solid fa-cloud"></i> Sincronización: <strong>ConfigCat Cloud</strong>
         </div>
       </div>
 
       <p class="flag-explainer">
-        Esta aplicación desacopla el <strong>Deploy</strong> del <strong>Release</strong>. 
-        En el <a href="https://app.configcat.com" target="_blank" class="link-configcat">Dashboard de ConfigCat <i class="fa-solid fa-arrow-up-right-from-square"></i></a>, 
-        puedes conmutar en vivo sin redesplegar:
+        Configura o prueba en vivo las funcionalidades avanzadas de la tienda con sincronización en tiempo real:
       </p>
 
       <div class="flag-simulation-controls" style="margin-bottom: 12px;">
-        <span class="control-label"><strong>Toggle 1 (Wishlist):</strong></span>
+        <span class="control-label"><strong>Lista de Deseos (Wishlist):</strong></span>
         <div class="segmented-control">
-          <button class="seg-btn" id="segBtnOff" onclick="aplicarSimulacionManual(false)">🔴 Forzar OFF (0%)</button>
-          <button class="seg-btn active" id="segBtnCloud" onclick="usarConfigCatCloud()">☁️ Usar ConfigCat Cloud</button>
-          <button class="seg-btn" id="segBtnOn" onclick="aplicarSimulacionManual(true)">🟢 Forzar ON (100%)</button>
+          <button class="seg-btn" id="segBtnOff" onclick="aplicarSimulacionManual(false)">🔴 Desactivar</button>
+          <button class="seg-btn active" id="segBtnCloud" onclick="usarConfigCatCloud()">☁️ Sincronizar con la Nube</button>
+          <button class="seg-btn" id="segBtnOn" onclick="aplicarSimulacionManual(true)">🟢 Activar</button>
         </div>
       </div>
 
       <div class="flag-simulation-controls">
-        <span class="control-label"><strong>Toggle 2 (Taller 6 - Pagos Express):</strong></span>
+        <span class="control-label"><strong>Compra Rápida en 1-Clic:</strong></span>
         <div class="segmented-control">
-          <button class="seg-btn active" id="segPagosOff" onclick="cambiarPagosExpress(false)">🔴 pagos-express-v1 (OFF)</button>
-          <button class="seg-btn" id="segPagosOn" onclick="cambiarPagosExpress(true)">⚡ Activar Pagos 1-Clic (ON)</button>
+          <button class="seg-btn active" id="segPagosOff" onclick="cambiarPagosExpress(false)">🔴 Desactivada (Modo Estándar)</button>
+          <button class="seg-btn" id="segPagosOn" onclick="cambiarPagosExpress(true)">⚡ Habilitar Compra en 1-Clic (ON)</button>
         </div>
       </div>
     </section>
@@ -967,12 +1045,12 @@ body {
 
     <!-- Grilla de Productos -->
     <section class="products-grid" id="productsGrid">
-      <!-- Inyección dinámica -->
+      <!-- Inyección dinámica desde script.js -->
     </section>
 
   </main>
 
-  <!-- Modal / Drawer de Mi Lista de Deseos (Ticket 3) -->
+  <!-- Modal / Drawer de Mi Lista de Deseos -->
   <div class="modal-backdrop" id="wishlistModal" style="display: none;" onclick="cerrarModalFuera(event)">
     <div class="modal-dialog">
       <div class="modal-header">
@@ -991,11 +1069,52 @@ body {
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="cerrarModalWishlist()">Seguir Explorando</button>
         <button class="btn btn-checkout" onclick="comprarWishlistCompleta()">
-          <i class="fa-solid fa-cart-shopping"></i> Comprar Todo (<span id="totalWishlistAmount">$0</span>)
+          <i class="fa-solid fa-cart-shopping"></i> Finalizar Pedido (<span id="totalWishlistAmount">$0</span>)
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Footer Corporativo -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h4>VentasStore</h4>
+        <p>Tu plataforma de confianza para la adquisición de equipos tecnológicos de alta gama, componentes originales y periféricos de alto desempeño.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Categorías</h5>
+        <ul>
+          <li><a href="#" onclick="filtrarCategoria('Electrónica'); return false;">Portátiles & Laptops</a></li>
+          <li><a href="#" onclick="filtrarCategoria('Monitores'); return false;">Monitores 4K UHD</a></li>
+          <li><a href="#" onclick="filtrarCategoria('Audio'); return false;">Audio & Auriculares</a></li>
+          <li><a href="#" onclick="filtrarCategoria('Accesorios'); return false;">Teclados & Ratones</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Atención al Cliente</h5>
+        <ul>
+          <li><a href="#">Centro de Ayuda</a></li>
+          <li><a href="#">Garantías y Devoluciones</a></li>
+          <li><a href="#">Rastreo de Envíos</a></li>
+          <li><a href="#">Términos y Condiciones</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Seguridad & Pagos</h5>
+        <ul>
+          <li><i class="fa-solid fa-lock"></i> Pagos 100% Protegidos</li>
+          <li><i class="fa-solid fa-credit-card"></i> Tarjetas Débito & Crédito</li>
+          <li><i class="fa-solid fa-bolt"></i> Compra Ágil en 1-Clic</li>
+          <li><i class="fa-solid fa-shield"></i> Privacidad de Datos</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 VentasStore. Todos los derechos reservados.</span>
+      <span>Plataforma Oficial de Comercio Electrónico</span>
+    </div>
+  </footer>
 
   <!-- Toast de Notificaciones Flotantes -->
   <div class="toast-container" id="toastContainer"></div>
@@ -1005,7 +1124,7 @@ body {
 const CONFIGCAT_SDK_KEY = "configcat-sdk-1/jyHfCAeT0E2Arwo28sVn6g/4yptu_1D2UORDKiU3dUviw";
 const FLAG_KEY = "wishlist_enabled";
 
-// Catálogo de Productos (Conectado a la taxonomía de MongoDB Atlas)
+// Catálogo Oficial de Productos
 const productosCatalog = [
   { sku: "PROD001", nombre: "Laptop Dell XPS 15 Intel i7", categoria: "Electrónica", precio: 4500000, stock: 25, icono: "fa-laptop" },
   { sku: "PROD002", nombre: "Audífonos Sony WH-1000XM5 Noise Cancelling", categoria: "Audio", precio: 1200000, stock: 40, icono: "fa-headphones" },
@@ -1020,7 +1139,7 @@ let wishlist = [];
 let currentCategory = "Todas";
 let searchQuery = "";
 let flagState = false; // Estado del Feature Flag (wishlist_enabled)
-let pagosExpressState = false; // Estado del Feature Flag Taller 6 (pagos-express-v1)
+let pagosExpressState = false; // Estado del Feature Flag (pagos-express-v1)
 let simulationMode = "cloud"; // "cloud" | "manual_off" | "manual_on"
 let configcatClient = null;
 
@@ -1326,7 +1445,7 @@ function showToast(mensaje, tipo = "info") {
   }, 3500);
 }
 
-// 7. Lógica del Caso Taller 6: Pagos Express (1-Clic)
+// 7. Lógica de Compra Express (1-Clic)
 function cambiarPagosExpress(enabled) {
   pagosExpressState = enabled;
   const badge = document.getElementById("cloudPagosBadge");
@@ -1334,7 +1453,7 @@ function cambiarPagosExpress(enabled) {
   const btnOn = document.getElementById("segPagosOn");
 
   if (badge) {
-    badge.innerText = enabled ? "ON (20% Canario)" : "OFF (0% Rollout)";
+    badge.innerText = enabled ? "ON (Habilitado)" : "OFF (Deshabilitado)";
     badge.className = `status-badge ${enabled ? "on" : "off"}`;
   }
   if (btnOff && btnOn) {
@@ -1344,9 +1463,9 @@ function cambiarPagosExpress(enabled) {
 
   showToast(
     enabled
-      ? "⚡ Caso Taller 6: pagos-express-v1 activado en modo Canario (20%)."
-      : "🛡️ Caso Taller 6: pagos-express-v1 en OFF (0% Rollout seguro en producción).",
-    enabled ? "success" : "warning"
+      ? "⚡ Función de Compra Rápida (1-Clic) habilitada exitosamente."
+      : "🛡️ Función de Compra Rápida (1-Clic) deshabilitada.",
+    enabled ? "success" : "info"
   );
   renderApp();
 }
@@ -1357,7 +1476,7 @@ async function procesarPagoExpressClick(sku, monto) {
 
   if (!pagosExpressState) {
     showToast(
-      `⛔ 403 Forbidden: Feature Toggle 'pagos-express-v1' en OFF (0%). Caso Taller 6: Código en main pero nadie lo activa.`,
+      `⛔ La opción de Compra en 1-Clic no está habilitada en este momento.`,
       "warning"
     );
     return;
@@ -1372,14 +1491,14 @@ async function procesarPagoExpressClick(sku, monto) {
     if (res.ok) {
       const data = await res.json();
       showToast(
-        `⚡ ¡Pago Express 1-Clic Aprobado! ${data.transaccion_id} por $${monto.toLocaleString("es-CO")} (${data.tiempo_respuesta_ms}ms)`,
+        `⚡ ¡Compra en 1-Clic Aprobada! Orden ${data.transaccion_id} por $${monto.toLocaleString("es-CO")} (${data.tiempo_respuesta_ms}ms)`,
         "success"
       );
     } else {
-      showToast(`⚡ ¡Pago Express 1-Clic aprobado localmente para ${nombre}!`, "success");
+      showToast(`⚡ ¡Compra en 1-Clic procesada para ${nombre}!`, "success");
     }
   } catch (e) {
-    showToast(`⚡ ¡Pago Express 1-Clic simulado con éxito para ${nombre}!`, "success");
+    showToast(`⚡ ¡Compra en 1-Clic procesada para ${nombre}!`, "success");
   }
 }
 
@@ -1389,6 +1508,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderApp();
 });
 
-</script>
+  </script>
 </body>
 </html>

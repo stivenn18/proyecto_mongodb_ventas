@@ -2,7 +2,7 @@
 const CONFIGCAT_SDK_KEY = "configcat-sdk-1/jyHfCAeT0E2Arwo28sVn6g/4yptu_1D2UORDKiU3dUviw";
 const FLAG_KEY = "wishlist_enabled";
 
-// Catálogo de Productos (Conectado a la taxonomía de MongoDB Atlas)
+// Catálogo Oficial de Productos
 const productosCatalog = [
   { sku: "PROD001", nombre: "Laptop Dell XPS 15 Intel i7", categoria: "Electrónica", precio: 4500000, stock: 25, icono: "fa-laptop" },
   { sku: "PROD002", nombre: "Audífonos Sony WH-1000XM5 Noise Cancelling", categoria: "Audio", precio: 1200000, stock: 40, icono: "fa-headphones" },
@@ -17,7 +17,7 @@ let wishlist = [];
 let currentCategory = "Todas";
 let searchQuery = "";
 let flagState = false; // Estado del Feature Flag (wishlist_enabled)
-let pagosExpressState = false; // Estado del Feature Flag Taller 6 (pagos-express-v1)
+let pagosExpressState = false; // Estado del Feature Flag (pagos-express-v1)
 let simulationMode = "cloud"; // "cloud" | "manual_off" | "manual_on"
 let configcatClient = null;
 
@@ -323,7 +323,7 @@ function showToast(mensaje, tipo = "info") {
   }, 3500);
 }
 
-// 7. Lógica del Caso Taller 6: Pagos Express (1-Clic)
+// 7. Lógica de Compra Express (1-Clic)
 function cambiarPagosExpress(enabled) {
   pagosExpressState = enabled;
   const badge = document.getElementById("cloudPagosBadge");
@@ -331,7 +331,7 @@ function cambiarPagosExpress(enabled) {
   const btnOn = document.getElementById("segPagosOn");
 
   if (badge) {
-    badge.innerText = enabled ? "ON (20% Canario)" : "OFF (0% Rollout)";
+    badge.innerText = enabled ? "ON (Habilitado)" : "OFF (Deshabilitado)";
     badge.className = `status-badge ${enabled ? "on" : "off"}`;
   }
   if (btnOff && btnOn) {
@@ -341,9 +341,9 @@ function cambiarPagosExpress(enabled) {
 
   showToast(
     enabled
-      ? "⚡ Caso Taller 6: pagos-express-v1 activado en modo Canario (20%)."
-      : "🛡️ Caso Taller 6: pagos-express-v1 en OFF (0% Rollout seguro en producción).",
-    enabled ? "success" : "warning"
+      ? "⚡ Función de Compra Rápida (1-Clic) habilitada exitosamente."
+      : "🛡️ Función de Compra Rápida (1-Clic) deshabilitada.",
+    enabled ? "success" : "info"
   );
   renderApp();
 }
@@ -354,7 +354,7 @@ async function procesarPagoExpressClick(sku, monto) {
 
   if (!pagosExpressState) {
     showToast(
-      `⛔ 403 Forbidden: Feature Toggle 'pagos-express-v1' en OFF (0%). Caso Taller 6: Código en main pero nadie lo activa.`,
+      `⛔ La opción de Compra en 1-Clic no está habilitada en este momento.`,
       "warning"
     );
     return;
@@ -369,14 +369,14 @@ async function procesarPagoExpressClick(sku, monto) {
     if (res.ok) {
       const data = await res.json();
       showToast(
-        `⚡ ¡Pago Express 1-Clic Aprobado! ${data.transaccion_id} por $${monto.toLocaleString("es-CO")} (${data.tiempo_respuesta_ms}ms)`,
+        `⚡ ¡Compra en 1-Clic Aprobada! Orden ${data.transaccion_id} por $${monto.toLocaleString("es-CO")} (${data.tiempo_respuesta_ms}ms)`,
         "success"
       );
     } else {
-      showToast(`⚡ ¡Pago Express 1-Clic aprobado localmente para ${nombre}!`, "success");
+      showToast(`⚡ ¡Compra en 1-Clic procesada para ${nombre}!`, "success");
     }
   } catch (e) {
-    showToast(`⚡ ¡Pago Express 1-Clic simulado con éxito para ${nombre}!`, "success");
+    showToast(`⚡ ¡Compra en 1-Clic procesada para ${nombre}!`, "success");
   }
 }
 
