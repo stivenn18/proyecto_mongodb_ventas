@@ -11,7 +11,835 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- ConfigCat JS SDK oficial via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/configcat-js@latest/dist/configcat.min.js"></script>
-  <link rel="stylesheet" href="/style.css">
+  <style>
+:root {
+  --primary: #1e3a8a;
+  --primary-light: #3b82f6;
+  --accent: #e11d48;
+  --accent-light: #ffe4e6;
+  --bg-main: #f8fafc;
+  --surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --radius: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cloud Statusbar */
+.cloud-statusbar {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 8px 24px;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+}
+
+.statusbar-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  display: inline-block;
+}
+
+.pulse {
+  box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+  animation: pulse-animation 1.8s infinite;
+}
+
+@keyframes pulse-animation {
+  0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(5, 150, 105, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+}
+
+.divider {
+  color: #334155;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.status-badge.on {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge.off {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-refresh {
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover {
+  background: #334155;
+  color: white;
+}
+
+/* Navbar */
+.navbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.logo h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-pro {
+  font-size: 0.65rem;
+  background: #dbeafe;
+  color: var(--primary);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.logo-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.search-bar-container {
+  flex: 1;
+  max-width: 420px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.search-bar-container input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border: 1px solid var(--border);
+  background: #f1f5f9;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-bar-container input:focus {
+  background: white;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.user-pill {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-pill strong {
+  color: var(--text-main);
+}
+
+.btn-wishlist-header {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-wishlist-header:hover {
+  background: #be123c;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.4);
+}
+
+.wishlist-badge {
+  background: white;
+  color: var(--accent);
+  border-radius: 12px;
+  padding: 2px 7px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* Container */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  flex: 1;
+}
+
+/* Hero */
+.hero-banner {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+  color: white;
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.hero-text h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.hero-text p {
+  color: #bfdbfe;
+  font-size: 0.95rem;
+  max-width: 600px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 14px 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-card i {
+  font-size: 1.5rem;
+  color: #93c5fd;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.stat-card span {
+  font-size: 0.75rem;
+  color: #dbeafe;
+}
+
+/* Feature Flag Card */
+.feature-flag-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 20px 26px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.flag-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.flag-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+}
+
+.flag-title h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.flag-mode-indicator {
+  font-size: 0.8rem;
+  background: #f0fdf4;
+  color: var(--success);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: 1px solid #bbf7d0;
+}
+
+.flag-explainer {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.link-configcat {
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.link-configcat:hover {
+  text-decoration: underline;
+}
+
+.flag-simulation-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8fafc;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.control-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.segmented-control {
+  display: flex;
+  gap: 6px;
+}
+
+.seg-btn {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.seg-btn:hover {
+  border-color: #cbd5e1;
+}
+
+.seg-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(30, 58, 138, 0.25);
+}
+
+/* Categories Bar */
+.categories-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 24px;
+}
+
+.cat-pill {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.cat-pill:hover {
+  border-color: #cbd5e1;
+  color: var(--text-main);
+}
+
+.cat-pill.active {
+  background: #0f172a;
+  color: white;
+  border-color: #0f172a;
+}
+
+/* Products Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
+}
+
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.product-img-wrapper {
+  background: #f1f5f9;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  color: #94a3b8;
+  position: relative;
+}
+
+.product-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-main);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.product-body {
+  padding: 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-category {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.product-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 6px 0 4px 0;
+}
+
+.product-sku {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.product-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.product-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.product-stock {
+  font-size: 0.75rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.product-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-buy {
+  flex: 1;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.btn-buy:hover {
+  background: #1e40af;
+}
+
+.btn-wishlist-card {
+  background: var(--accent-light);
+  color: var(--accent);
+  border: 1px solid #fecdd3;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-wishlist-card:hover {
+  background: #fecdd3;
+  transform: scale(1.03);
+}
+
+.btn-wishlist-card.saved {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.btn-express {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.btn-express:hover {
+  background: #fde68a;
+  transform: scale(1.02);
+}
+
+.btn-express.locked {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+}
+
+.btn-express.active {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #d97706;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-dialog {
+  background: white;
+  width: 100%;
+  max-width: 580px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: modal-enter 0.2s ease-out;
+}
+
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 18px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.modal-count-pill {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-body {
+  padding: 20px 24px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.wishlist-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.wishlist-empty i {
+  font-size: 3rem;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.wishlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.wishlist-item:last-child {
+  border-bottom: none;
+}
+
+.wishlist-item-info h5 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.wishlist-item-info span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.btn-remove-wishlist {
+  background: #fee2e2;
+  color: var(--danger);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-remove-wishlist:hover {
+  background: #fecdd3;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-checkout {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+}
+
+.btn-checkout:hover {
+  background: #047857;
+}
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: #0f172a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: toast-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes toast-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+</style>
 </head>
 <body>
 
@@ -172,6 +1000,395 @@
   <!-- Toast de Notificaciones Flotantes -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="/script.js"></script>
+  <script>
+// Clave Real de ConfigCat SDK
+const CONFIGCAT_SDK_KEY = "configcat-sdk-1/jyHfCAeT0E2Arwo28sVn6g/4yptu_1D2UORDKiU3dUviw";
+const FLAG_KEY = "wishlist_enabled";
+
+// Catálogo de Productos (Conectado a la taxonomía de MongoDB Atlas)
+const productosCatalog = [
+  { sku: "PROD001", nombre: "Laptop Dell XPS 15 Intel i7", categoria: "Electrónica", precio: 4500000, stock: 25, icono: "fa-laptop" },
+  { sku: "PROD002", nombre: "Audífonos Sony WH-1000XM5 Noise Cancelling", categoria: "Audio", precio: 1200000, stock: 40, icono: "fa-headphones" },
+  { sku: "PROD003", nombre: "Monitor Samsung 4K UHD 27\"", categoria: "Monitores", precio: 1650000, stock: 15, icono: "fa-desktop" },
+  { sku: "PROD004", nombre: "Teclado Mecánico RGB Switch Red", categoria: "Accesorios", precio: 350000, stock: 80, icono: "fa-keyboard" },
+  { sku: "PROD005", nombre: "Mouse Ergonómico Inalámbrico MX Master 3S", categoria: "Accesorios", precio: 420000, stock: 55, icono: "fa-computer-mouse" },
+  { sku: "PROD006", nombre: "Silla Ergonómica Pro Soporte Lumbar", categoria: "Muebles", precio: 850000, stock: 12, icono: "fa-chair" }
+];
+
+// Estado de la aplicación
+let wishlist = [];
+let currentCategory = "Todas";
+let searchQuery = "";
+let flagState = false; // Estado del Feature Flag (wishlist_enabled)
+let pagosExpressState = false; // Estado del Feature Flag Taller 6 (pagos-express-v1)
+let simulationMode = "cloud"; // "cloud" | "manual_off" | "manual_on"
+let configcatClient = null;
+
+// 1. Inicialización de ConfigCat SDK
+function initConfigCat() {
+  const badge = document.getElementById("cloudFlagBadge");
+  badge.innerText = "Conectando...";
+  badge.className = "status-badge";
+
+  try {
+    if (window.configcat) {
+      configcatClient = window.configcat.getClient(
+        CONFIGCAT_SDK_KEY,
+        window.configcat.PollingMode.AutoPoll,
+        { pollIntervalSeconds: 5 } // Polling en tiempo real cada 5 segundos
+      );
+
+      configcatClient.on('clientReady', async () => {
+        console.log("✅ ConfigCat JS SDK Listo");
+        evaluarFlagDesdeCloud();
+      });
+
+      configcatClient.on('configChanged', () => {
+        console.log("⚡ ConfigCat: Configuración de Feature Flag cambiada en la nube");
+        evaluarFlagDesdeCloud();
+      });
+    } else {
+      console.warn("ConfigCat SDK JS no disponible, usando API del backend");
+      consultarFlagBackend();
+    }
+  } catch (err) {
+    console.error("Error inicializando ConfigCat:", err);
+    consultarFlagBackend();
+  }
+}
+
+async function evaluarFlagDesdeCloud() {
+  if (simulationMode !== "cloud") return;
+
+  if (configcatClient) {
+    const value = await configcatClient.getValueAsync(FLAG_KEY, false);
+    actualizarEstadoFlag(value, "ConfigCat Cloud");
+  } else {
+    consultarFlagBackend();
+  }
+}
+
+async function consultarFlagBackend() {
+  try {
+    const res = await fetch("/api/flags");
+    if (res.ok) {
+      const data = await res.json();
+      actualizarEstadoFlag(data.wishlist_enabled, data.source);
+    }
+  } catch (e) {
+    // Si corre como archivo estático local sin backend
+    actualizarEstadoFlag(false, "Local Default (OFF)");
+  }
+}
+
+function forzarSincronizacionCloud() {
+  showToast("🔄 Sincronizando con ConfigCat Cloud...", "info");
+  if (configcatClient) {
+    configcatClient.forceRefreshAsync().then(() => {
+      evaluarFlagDesdeCloud();
+      showToast("✅ Sincronización completada.", "success");
+    });
+  } else {
+    consultarFlagBackend();
+  }
+}
+
+function actualizarEstadoFlag(enabled, source) {
+  flagState = enabled;
+  const badge = document.getElementById("cloudFlagBadge");
+  const indicator = document.getElementById("flagModeIndicator");
+
+  if (badge) {
+    badge.innerText = flagState ? "ON (Habilitado)" : "OFF (Deshabilitado)";
+    badge.className = `status-badge ${flagState ? "on" : "off"}`;
+  }
+
+  if (indicator) {
+    indicator.innerHTML = `<i class="fa-solid fa-${flagState ? "circle-check" : "circle-xmark"}"></i> Estado: <strong>${flagState ? "100% / Activo" : "0% / Oculto"}</strong> (${source})`;
+  }
+
+  renderApp();
+}
+
+// 2. Modos de Simulación para Demostración en Vivo
+function aplicarSimulacionManual(valor) {
+  simulationMode = valor ? "manual_on" : "manual_off";
+  actualizarBotonesSegmented();
+  actualizarEstadoFlag(valor, "Simulación Manual");
+  showToast(`Modo cambiado: Feature Flag forzado a ${valor ? "ON (100%)" : "OFF (0%)"}`, valor ? "success" : "warning");
+}
+
+function usarConfigCatCloud() {
+  simulationMode = "cloud";
+  actualizarBotonesSegmented();
+  showToast("Conectando con ConfigCat Cloud...", "info");
+  evaluarFlagDesdeCloud();
+}
+
+function actualizarBotonesSegmented() {
+  document.getElementById("segBtnOff").className = `seg-btn ${simulationMode === "manual_off" ? "active" : ""}`;
+  document.getElementById("segBtnCloud").className = `seg-btn ${simulationMode === "cloud" ? "active" : ""}`;
+  document.getElementById("segBtnOn").className = `seg-btn ${simulationMode === "manual_on" ? "active" : ""}`;
+}
+
+// 3. Renderizado de la Tienda
+function renderApp() {
+  // Visibilidad del botón de cabecera
+  const btnHeader = document.getElementById("btnHeaderWishlist");
+  if (btnHeader) {
+    btnHeader.style.display = flagState ? "flex" : "none";
+  }
+
+  // Filtrado de productos
+  const grid = document.getElementById("productsGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const filtrados = productosCatalog.filter(p => {
+    const matchCat = currentCategory === "Todas" || p.categoria === currentCategory;
+    const matchSearch = p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
+  if (filtrados.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">No se encontraron productos coincidentes.</div>`;
+    return;
+  }
+
+  filtrados.forEach(p => {
+    const isSaved = wishlist.some(item => item.sku === p.sku);
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="product-img-wrapper">
+        <span class="product-tag">${p.categoria}</span>
+        <i class="fa-solid ${p.icono}"></i>
+      </div>
+      <div class="product-body">
+        <div>
+          <span class="product-category">${p.categoria}</span>
+          <h4 class="product-title">${p.nombre}</h4>
+          <div class="product-sku">SKU: ${p.sku}</div>
+        </div>
+        <div>
+          <div class="product-price-row">
+            <div class="product-price">$${p.precio.toLocaleString("es-CO")}</div>
+            <div class="product-stock"><i class="fa-solid fa-check"></i> Stock: ${p.stock}</div>
+          </div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="comprar('${p.sku}')">
+              <i class="fa-solid fa-bag-shopping"></i> Comprar
+            </button>
+            <button class="btn-express ${pagosExpressState ? 'active' : 'locked'}" onclick="procesarPagoExpressClick('${p.sku}', ${p.precio})" title="${pagosExpressState ? 'Pago Express 1-Clic activo' : 'Toggle pagos-express-v1 apagado (0%)'}">
+              <i class="fa-solid ${pagosExpressState ? 'fa-bolt' : 'fa-lock'}"></i> 1-Clic
+            </button>
+            ${flagState ? `
+              <button class="btn-wishlist-card ${isSaved ? "saved" : ""}" onclick="toggleDeseo('${p.sku}')">
+                <i class="fa-${isSaved ? "solid" : "regular"} fa-heart"></i>
+                <span>${isSaved ? "Guardado" : "Deseo"}</span>
+              </button>
+            ` : ""}
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Actualizar contadores
+  const countBadge = document.getElementById("wishlistCount");
+  const modalCount = document.getElementById("modalWishlistCount");
+  if (countBadge) countBadge.innerText = wishlist.length;
+  if (modalCount) modalCount.innerText = `${wishlist.length} producto${wishlist.length === 1 ? "" : "s"}`;
+}
+
+// 4. Lógica de Wishlist (Ticket 1, 2 y 3)
+function toggleDeseo(sku) {
+  if (!flagState) {
+    showToast("⚠️ La función de Lista de Deseos está deshabilitada (Toggle OFF).", "warning");
+    return;
+  }
+
+  const prod = productosCatalog.find(p => p.sku === sku);
+  if (!prod) return;
+
+  const index = wishlist.findIndex(item => item.sku === sku);
+  if (index > -1) {
+    wishlist.splice(index, 1);
+    showToast(`Eliminado de lista de deseos: ${prod.nombre}`, "warning");
+  } else {
+    wishlist.push({ ...prod, fechaAgregado: new Date().toLocaleTimeString() });
+    showToast(`❤️ Guardado en tu lista de deseos: ${prod.nombre}`, "success");
+  }
+
+  renderApp();
+  renderModalItems();
+}
+
+function filtrarCategoria(categoria, elem) {
+  currentCategory = categoria;
+  document.querySelectorAll(".cat-pill").forEach(p => p.classList.remove("active"));
+  if (elem) elem.classList.add("active");
+  renderApp();
+}
+
+function filtrarProductos() {
+  searchQuery = document.getElementById("searchInput").value;
+  renderApp();
+}
+
+function comprar(sku) {
+  const prod = productosCatalog.find(p => p.sku === sku);
+  showToast(`🛍️ Procesando orden para: ${prod ? prod.nombre : sku}...`, "info");
+}
+
+// 5. Modal de Wishlist
+function abrirModalWishlist() {
+  if (!flagState) return;
+  renderModalItems();
+  document.getElementById("wishlistModal").style.display = "flex";
+}
+
+function cerrarModalWishlist() {
+  document.getElementById("wishlistModal").style.display = "none";
+}
+
+function cerrarModalFuera(e) {
+  if (e.target.id === "wishlistModal") {
+    cerrarModalWishlist();
+  }
+}
+
+function renderModalItems() {
+  const container = document.getElementById("wishlistItemsContainer");
+  const totalAmountElem = document.getElementById("totalWishlistAmount");
+  if (!container) return;
+
+  if (wishlist.length === 0) {
+    container.innerHTML = `
+      <div class="wishlist-empty">
+        <i class="fa-regular fa-heart"></i>
+        <h4>Tu lista de deseos está vacía</h4>
+        <p>Haz clic en el botón de corazón en los productos para guardarlos aquí.</p>
+      </div>
+    `;
+    if (totalAmountElem) totalAmountElem.innerText = "$0";
+    return;
+  }
+
+  let total = 0;
+  container.innerHTML = wishlist.map(item => {
+    total += item.precio;
+    return `
+      <div class="wishlist-item">
+        <div class="wishlist-item-info">
+          <h5>${item.nombre}</h5>
+          <span>SKU: ${item.sku} &middot; $${item.precio.toLocaleString("es-CO")}</span>
+        </div>
+        <button class="btn-remove-wishlist" onclick="toggleDeseo('${item.sku}')">
+          <i class="fa-solid fa-trash"></i> Quitar
+        </button>
+      </div>
+    `;
+  }).join("");
+
+  if (totalAmountElem) {
+    totalAmountElem.innerText = `$${total.toLocaleString("es-CO")}`;
+  }
+}
+
+function comprarWishlistCompleta() {
+  if (wishlist.length === 0) return;
+  showToast(`🎉 ¡Compra exitosa de ${wishlist.length} productos guardados!`, "success");
+  wishlist = [];
+  cerrarModalWishlist();
+  renderApp();
+}
+
+// 6. Toasts de Notificación
+function showToast(mensaje, tipo = "info") {
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  const icon = tipo === "success" ? "fa-circle-check" : (tipo === "warning" ? "fa-triangle-exclamation" : "fa-circle-info");
+  const iconColor = tipo === "success" ? "#4ade80" : (tipo === "warning" ? "#fbbf24" : "#60a5fa");
+
+  toast.innerHTML = `<i class="fa-solid ${icon}" style="color: ${iconColor};"></i> <span>${mensaje}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    toast.style.transition = "all 0.3s";
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// 7. Lógica del Caso Taller 6: Pagos Express (1-Clic)
+function cambiarPagosExpress(enabled) {
+  pagosExpressState = enabled;
+  const badge = document.getElementById("cloudPagosBadge");
+  const btnOff = document.getElementById("segPagosOff");
+  const btnOn = document.getElementById("segPagosOn");
+
+  if (badge) {
+    badge.innerText = enabled ? "ON (20% Canario)" : "OFF (0% Rollout)";
+    badge.className = `status-badge ${enabled ? "on" : "off"}`;
+  }
+  if (btnOff && btnOn) {
+    btnOff.classList.toggle("active", !enabled);
+    btnOn.classList.toggle("active", enabled);
+  }
+
+  showToast(
+    enabled
+      ? "⚡ Caso Taller 6: pagos-express-v1 activado en modo Canario (20%)."
+      : "🛡️ Caso Taller 6: pagos-express-v1 en OFF (0% Rollout seguro en producción).",
+    enabled ? "success" : "warning"
+  );
+  renderApp();
+}
+
+async function procesarPagoExpressClick(sku, monto) {
+  const prod = productosCatalog.find(p => p.sku === sku);
+  const nombre = prod ? prod.nombre : sku;
+
+  if (!pagosExpressState) {
+    showToast(
+      `⛔ 403 Forbidden: Feature Toggle 'pagos-express-v1' en OFF (0%). Caso Taller 6: Código en main pero nadie lo activa.`,
+      "warning"
+    );
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/pagos-express", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cliente_id: "CLI001", sku: sku, monto: monto })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      showToast(
+        `⚡ ¡Pago Express 1-Clic Aprobado! ${data.transaccion_id} por $${monto.toLocaleString("es-CO")} (${data.tiempo_respuesta_ms}ms)`,
+        "success"
+      );
+    } else {
+      showToast(`⚡ ¡Pago Express 1-Clic aprobado localmente para ${nombre}!`, "success");
+    }
+  } catch (e) {
+    showToast(`⚡ ¡Pago Express 1-Clic simulado con éxito para ${nombre}!`, "success");
+  }
+}
+
+// Inicializar al cargar
+document.addEventListener("DOMContentLoaded", () => {
+  initConfigCat();
+  renderApp();
+});
+
+</script>
 </body>
 </html>
