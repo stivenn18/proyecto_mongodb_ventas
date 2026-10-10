@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miro Board · Taller 6: Sprint Retrospective & Liberación Segura en CD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --miro-yellow: #fff3a8;
+      --miro-green: #d3f9d8;
+      --miro-red: #ffc9c9;
+      --miro-blue: #d0ebff;
+      --miro-purple: #eebefa;
+      --miro-orange: #ffe8cc;
+      --miro-bg: #f5f6f8;
+      --miro-dot: #d8dbe0;
+      --miro-border: #e0e2e6;
+      --text: #22252a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--miro-bg);
+      background-image: radial-gradient(var(--miro-dot) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: auto;
+    }
+
+    /* Miro Top Bar */
+    .miro-navbar {
+      height: 56px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--miro-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .miro-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .miro-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #050038;
+      text-decoration: none;
+    }
+
+    .miro-logo-icon {
+      background: #ffd02f;
+      color: #050038;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 1.1rem;
+    }
+
+    .board-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .board-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #050038;
+    }
+
+    .board-subtitle {
+      font-size: 0.72rem;
+      color: #72767d;
+    }
+
+    .miro-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .timer-pill {
+      background: #f1f3f5;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #e03131;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #dee2e6;
+    }
+
+    .avatar-stack {
+      display: flex;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: white;
+      margin-left: -8px;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .av-po { background: #3b82f6; }
+    .av-sm { background: #8b5cf6; }
+    .av-dev { background: #10b981; }
+
+    .btn-miro-export {
+      background: #4262ff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-miro-export:hover { background: #304ecc; }
+
+    /* Canvas Area */
+    .canvas-container {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      min-width: 1400px;
+    }
+
+    /* Frames de Miro */
+    .miro-frame {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      border: 2px dashed #b1b5be;
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    .frame-badge {
+      position: absolute;
+      top: -14px;
+      left: 24px;
+      background: #050038;
+      color: white;
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .frame-header {
+      margin-bottom: 20px;
+    }
+
+    .frame-header h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #050038;
+    }
+
+    .frame-header p {
+      font-size: 0.85rem;
+      color: #555c68;
+      margin-top: 4px;
+    }
+
+    /* Grid de Columnas de Retrospectiva */
+    .retro-columns-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .retro-column {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .col-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 2px solid;
+    }
+
+    .col-header.green { border-color: #2b8a3e; color: #2b8a3e; }
+    .col-header.yellow { border-color: #e67700; color: #e67700; }
+    .col-header.red { border-color: #c92a2a; color: #c92a2a; }
+    .col-header.blue { border-color: #1864ab; color: #1864ab; }
+
+    .col-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .col-count {
+      background: rgba(0,0,0,0.06);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Post-it / Sticky Note */
+    .sticky-note {
+      padding: 16px;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: grab;
+    }
+
+    .sticky-note:hover {
+      transform: translateY(-4px) rotate(-0.5deg);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+
+    .sticky-green { background: var(--miro-green); border-left: 4px solid #40c057; }
+    .sticky-yellow { background: var(--miro-yellow); border-left: 4px solid #fcc419; }
+    .sticky-red { background: var(--miro-red); border-left: 4px solid #fa5252; }
+    .sticky-blue { background: var(--miro-blue); border-left: 4px solid #339af0; }
+    .sticky-purple { background: var(--miro-purple); border-left: 4px solid #be4bdb; }
+
+    .sticky-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: #1a1c20;
+      font-weight: 600;
+    }
+
+    .sticky-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(0,0,0,0.12);
+      font-size: 0.72rem;
+      color: #495057;
+    }
+
+    .sticky-author {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sticky-votes {
+      background: rgba(255,255,255,0.7);
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-weight: 800;
+      color: #212529;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* Frame 2: Salud del Pipeline & TBD */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .metric-card-box {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .metric-box-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #050038;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f3f5;
+    }
+
+    /* Frame 3: Safe Release Protocol Flow */
+    .flow-pipeline-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+
+    .flow-step-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .flow-step-card.active-step {
+      border-color: #2563eb;
+      background: #f8faff;
+    }
+
+    .step-number {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #2563eb;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 0.8rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* Acciones de Mejora Destacadas */
+    .action-badge-prio {
+      background: #1864ab;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    /* Floating Toolbar */
+    .miro-toolbar-left {
+      position: fixed;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      border: 1px solid var(--miro-border);
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 90;
+    }
+
+    .tool-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #495057;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .tool-btn:hover, .tool-btn.active {
+      background: #edf2ff;
+      color: #3b5bdb;
+    }
+
+    @media print {
+      .miro-navbar, .miro-toolbar-left, .btn-miro-export { display: none; }
+      body { background: white; }
+      .canvas-container { min-width: auto; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Superior de Navegación Miro -->
+  <nav class="miro-navbar">
+    <div class="miro-nav-left">
+      <a href="#" class="miro-logo">
+        <div class="miro-logo-icon">M</div>
+        <span>miro</span>
+      </a>
+      <div style="height: 24px; width: 1px; background: #e0e2e6;"></div>
+      <div class="board-title-group">
+        <span class="board-title">Taller 6: Sprint Retrospective & Safe Release in Continuous Deployment</span>
+        <span class="board-subtitle">Equipo Scrum / TBD &middot; Última sincronización hace 2 minutos &middot; Solo lectura (Presentación)</span>
+      </div>
+    </div>
+
+    <div class="miro-nav-right">
+      <div class="timer-pill">
+        <i class="fa-regular fa-clock"></i>
+        <span>Timebox: 45:00 min</span>
+      </div>
+
+      <div class="avatar-stack">
+        <div class="avatar av-po" title="Product Owner">PO</div>
+        <div class="avatar av-sm" title="Scrum Master">SM</div>
+        <div class="avatar av-dev" title="Tech Lead / Developer">DEV</div>
+      </div>
+
+      <button class="btn-miro-export" onclick="window.print()">
+        <i class="fa-solid fa-camera"></i> Guardar Captura
+      </button>
+    </div>
+  </nav>
+
+  <!-- Barra de Herramientas Flotante Estilo Miro -->
+  <aside class="miro-toolbar-left">
+    <button class="tool-btn active" title="Seleccionar"><i class="fa-solid fa-arrow-pointer"></i></button>
+    <button class="tool-btn" title="Post-it"><i class="fa-regular fa-note-sticky"></i></button>
+    <button class="tool-btn" title="Texto"><i class="fa-solid fa-font"></i></button>
+    <button class="tool-btn" title="Formas"><i class="fa-regular fa-square"></i></button>
+    <button class="tool-btn" title="Conector"><i class="fa-solid fa-arrow-right"></i></button>
+    <button class="tool-btn" title="Comentarios"><i class="fa-regular fa-comment"></i></button>
+  </aside>
+
+  <!-- Área de Lienzo / Canvas -->
+  <main class="canvas-container">
+
+    <!-- FRAME 1: RETROSPECTIVA SEMÁFORO DE FLUJO -->
+    <section class="miro-frame">
+      <div class="frame-badge">
+        <i class="fa-solid fa-table-columns"></i> Frame 1 &middot; Dinámica Oficial de Retrospectiva
+      </div>
+
+      <div class="frame-header">
+        <h2>Inspección de Flujo: Semáforo de Fricciones y Acciones de Mejora</h2>
+        <p>Retrospectiva adaptada a Trunk-Based Development y Continuous Deployment (Timebox: 30 minutos).</p>
+      </div>
+
+      <div class="retro-columns-grid">
+
+        <!-- Columna 1: 🟢 Lo que funcionó bien -->
+        <div class="retro-column">
+          <div class="col-header green">
+            <span class="col-title"><i class="fa-solid fa-circle-check"></i> Lo que funcionó bien</span>
+            <span class="col-count">4 notas</span>
+          </div>
+
+          <div class="sticky-note sticky-green">
+            <div class="sticky-text">
+              El pipeline de CI en GitHub Actions valida linting (Ruff) y 8 pruebas unitarias (Pytest) en menos de 15 segundos de forma 100% automática.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Dev Lead</span>
+              <span class="sticky-votes">👍 5</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-green">
+            <div class="sticky-text">
+              Auto-despliegue continuo hacia Render operativo tras cada integración a main. Eliminamos completamente las ventanas nocturnas de release.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Scrum Master</span>
+              <span class="sticky-votes">👍 4</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-green">
+            <div class="sticky-text">
+              ConfigCat SDK en vivo permite conmutar la Wishlist en menos de 5 segundos sin tener que redesplegar la app ni reiniciar el backend.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Product Owner</span>
+              <span class="sticky-votes">👍 6</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-green">
+            <div class="sticky-text">
+              La Definition of Done (DoD) de 3 dimensiones (Técnico + Negocio + Despliegue) brindó claridad total sobre el estado 'Done' en producción.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Equipo</span>
+              <span class="sticky-votes">👍 3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna 2: 🟡 Lo que generó fricción -->
+        <div class="retro-column">
+          <div class="col-header yellow">
+            <span class="col-title"><i class="fa-solid fa-triangle-exclamation"></i> Lo que generó fricción</span>
+            <span class="col-count">3 notas</span>
+          </div>
+
+          <div class="sticky-note sticky-yellow">
+            <div class="sticky-text">
+              La regla de branch protection exigía 1 aprobación de PR incluso para micro-commits atómicos, retrasando las integraciones diarias a main.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Dev 1</span>
+              <span class="sticky-votes">🔥 4</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-yellow">
+            <div class="sticky-text">
+              Ausencia de un dashboard de métricas de negocio en tiempo real (conversión/errores 5xx) antes de decidir si activamos un toggle en ConfigCat.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Product Owner</span>
+              <span class="sticky-votes">🔥 5</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-yellow">
+            <div class="sticky-text">
+              El sprint actual registró solo 4 integraciones a main, muy por debajo de la meta de Trunk-Based Development (mínimo 1 diaria por desarrollador).
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Scrum Master</span>
+              <span class="sticky-votes">🔥 3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna 3: 🔴 Lo que rompió el flujo o generó miedo -->
+        <div class="retro-column">
+          <div class="col-header red">
+            <span class="col-title"><i class="fa-solid fa-skull-crossbones"></i> Rompió el flujo / Miedo</span>
+            <span class="col-count">3 notas</span>
+          </div>
+
+          <div class="sticky-note sticky-red">
+            <div class="sticky-text">
+              <strong>Caso Pagos Express:</strong> Presión de marketing para activar el toggle un viernes al 20% sin observabilidad ni plan de contingencia de fin de semana.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Tech Lead</span>
+              <span class="sticky-votes">⚠️ 6</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-red">
+            <div class="sticky-text">
+              Un <strong>test flaky (intermitente)</strong> en CI bloqueó una rama durante 4 días enteros, destruyendo la cadencia de integración continua.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Dev 2</span>
+              <span class="sticky-votes">⚠️ 5</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-red">
+            <div class="sticky-text">
+              Deuda técnica de Feature Toggles: existen 3 flags obsoletos con más de 45 días en producción que nadie ha limpiado del código.
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author"><i class="fa-solid fa-user"></i> Dev 1</span>
+              <span class="sticky-votes">⚠️ 4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna 4: 🛠️ Acciones de Mejora Acordadas (Solución Oficial) -->
+        <div class="retro-column">
+          <div class="col-header blue">
+            <span class="col-title"><i class="fa-solid fa-wrench"></i> Acciones de Mejora Acordadas</span>
+            <span class="col-count">3 oficiales</span>
+          </div>
+
+          <div class="sticky-note sticky-blue">
+            <div>
+              <span class="action-badge-prio">ACCIÓN 1 &middot; MÁXIMA PRIORIDAD</span>
+              <div class="sticky-text">
+                <strong>Arreglar el test flaky en las próximas 24 h:</strong> Es la máxima prioridad para restaurar la confianza en el CI y desbloquear el flujo continuo de integración a main.
+              </div>
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author">👤 Resp: Dev Lead</span>
+              <span class="sticky-votes">⏱️ &lt; 24h</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-blue">
+            <div>
+              <span class="action-badge-prio">ACCIÓN 2 &middot; OBSERVABILIDAD</span>
+              <div class="sticky-text">
+                <strong>Crear un dashboard mínimo de métricas de pagos:</strong> Instrumentar contadores de errores 5xx y tasa de conversión antes de autorizar cualquier activación de toggles.
+              </div>
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author">👤 Resp: PO + Dev</span>
+              <span class="sticky-votes">⏱️ Máx 3 días</span>
+            </div>
+          </div>
+
+          <div class="sticky-note sticky-blue">
+            <div>
+              <span class="action-badge-prio">ACCIÓN 3 &middot; DEUDA TÉCNICA</span>
+              <div class="sticky-text">
+                <strong>Limpiar o eliminar los 3 toggles antiguos en este mismo sprint:</strong> Erradicar la deuda acumulada de flags con más de 45 días para evitar fallos colaterales.
+              </div>
+            </div>
+            <div class="sticky-footer">
+              <span class="sticky-author">👤 Resp: Equipo TBD</span>
+              <span class="sticky-votes">📅 Este Sprint</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Banner de Acuerdo de Estabilidad -->
+      <div style="margin-top: 20px; background: #e7f5ff; border: 2px solid #339af0; padding: 14px 20px; border-radius: 10px; font-size: 0.88rem; color: #1864ab; display: flex; align-items: center; gap: 12px;">
+        <i class="fa-solid fa-handshake" style="font-size: 1.4rem;"></i>
+        <span><strong>ACUERDO VINCULANTE:</strong> No se activará ningún toggle nuevo a usuarios reales hasta que el health check no haya fallado en los últimos <strong>7 deploys consecutivos</strong>.</span>
+      </div>
+    </section>
+
+    <!-- FRAME 2: LOS 3 FOCOS OBLIGATORIOS DE LA RETROSPECTIVA -->
+    <section class="miro-frame">
+      <div class="frame-badge">
+        <i class="fa-solid fa-chart-line"></i> Frame 2 &middot; Métricas Clave de Flujo Continuo
+      </div>
+
+      <div class="frame-header">
+        <h2>Inspección Obligatoria: Salud del Pipeline, Disciplina TBD y Flujo de Valor</h2>
+        <p>Evaluación objetiva con datos de telemetría y métricas del ciclo de entrega.</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card-box">
+          <div class="metric-box-title">
+            <i class="fa-solid fa-heart-pulse" style="color: #e03131;"></i> 1. Salud del Pipeline
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.5; color: #495057;">
+            <strong>¿Cuántas veces falló el CI?:</strong> 1 vez debido a un test flaky.<br>
+            <strong>Tiempo de despliegue promedio:</strong> 1 min 45 s en Render.<br>
+            <strong>Rollbacks registrados:</strong> 1 rollback manual tras fallo de 11 min en health check (ya mitigado con timeout de 2s).
+          </p>
+        </div>
+
+        <div class="metric-card-box">
+          <div class="metric-box-title">
+            <i class="fa-solid fa-code-branch" style="color: #2b8a3e;"></i> 2. Disciplina TBD
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.5; color: #495057;">
+            <strong>Integraciones a main:</strong> 4 en el sprint (Meta: &ge;1 diaria).<br>
+            <strong>Vida máxima de ramas:</strong> 1 rama vivió 4 días (inaceptable en TBD, resuelto con la política de cuarentena).<br>
+            <strong>Estado de Feature Flags:</strong> 1 activo en ConfigCat (Wishlist), 1 protegido en OFF (Pagos Express).
+          </p>
+        </div>
+
+        <div class="metric-card-box">
+          <div class="metric-box-title">
+            <i class="fa-solid fa-bolt" style="color: #1971c2;"></i> 3. Flujo de Valor
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.5; color: #495057;">
+            <strong>Lead Time for Changes:</strong> 25 minutos desde commit local hasta producción activa en Render.<br>
+            <strong>¿Llegó el valor a los usuarios?:</strong> Sí, catálogo y wishlist operando de forma continua con validación real sin caídas de servicio.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FRAME 3: ESTRATEGIA DE LIBERACIÓN SEGURA (DECISIÓN FINAL) -->
+    <section class="miro-frame">
+      <div class="frame-badge">
+        <i class="fa-solid fa-shield-halved"></i> Frame 3 &middot; Estrategia de Liberación Segura (Decisión Final)
+      </div>
+
+      <div class="frame-header">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h2>Decisión Final: <span style="color: #c92a2a;">NO SE ACTIVA EL 20% ESTE VIERNES</span></h2>
+          <span style="background: #ffe3e3; color: #c92a2a; padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.8rem;">Decisión Madura Acordada</span>
+        </div>
+        <p>Plan acordado en 5 pasos protegiendo la confianza del pipeline y la disciplina TBD por encima de la presión comercial.</p>
+      </div>
+
+      <div class="flow-pipeline-container" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="flow-step-card">
+          <div class="step-number">Paso 1 &middot; Esta Semana</div>
+          <div class="step-title">Test Flaky + Toggles</div>
+          <div class="step-desc">Resolver el test flaky en <24h y limpiar los 3 toggles viejos (>45d) en este mismo sprint.</div>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-number">Paso 2 &middot; Máximo 3 Días</div>
+          <div class="step-title">Métricas de Pagos</div>
+          <div class="step-desc">Implementar métricas básicas de error 5xx y tasa de conversión antes de cualquier activación.</div>
+        </div>
+
+        <div class="flow-step-card active-step">
+          <div class="step-number">Paso 3 &middot; 1-2 Días</div>
+          <div class="step-title">Usuarios Internos</div>
+          <div class="step-desc">Activar primero solo para usuarios internos / equipo con 1 a 2 días de observación controlada.</div>
+        </div>
+
+        <div class="flow-step-card">
+          <div class="step-number">Paso 4 &middot; Rollout Gradual</div>
+          <div class="step-title">Subir al 5% &rarr; 20%</div>
+          <div class="step-desc">Si todo está estable, subir al 5% y luego al 20% con observación de 48 horas en cada paso.</div>
+        </div>
+
+        <div class="flow-step-card" style="border-color: #c92a2a; background: #fff5f5;">
+          <div class="step-number" style="color: #c92a2a;">Paso 5 &middot; Criterio Rollback</div>
+          <div class="step-title" style="color: #c92a2a;">Aumento > 0,5% Error</div>
+          <div class="step-desc">Criterio de rollback automático: cualquier aumento > 0,5% en errores de pago dispara el apagado inmediato en ConfigCat.</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 18px; background: #f8f9fa; border-left: 4px solid #050038; padding: 14px 18px; border-radius: 4px; font-size: 0.85rem; color: #212529; line-height: 1.5;">
+        <strong>Resumen de la decisión madura:</strong> <em>“Se protege la confianza del pipeline y la disciplina TBD por encima de la presión comercial de corto plazo. Se comunica con transparencia al stakeholder y se define un camino claro y seguro de liberación. Este caso combina presión de negocio, deuda técnica, fallos recientes de pipeline, falta de métricas y ruptura de disciplina TBD. Obliga al equipo a negociar, priorizar y aplicar todo lo aprendido en los cuatro talleres.”</em>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    console.log("Miro board loaded successfully.");
+  </script>
+</body>
+</html>

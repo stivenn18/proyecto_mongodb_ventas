@@ -380,6 +380,13 @@ Cada incremento presentado durante el Review debe seguir una pauta ágil y rigur
 * **Estado:** 100% Activo en producción.
 * **Demo en vivo:** Consulta de `/health` devolviendo `{ "status": "healthy" }` con latencia inferior a 50 ms.
 
+### 13.4. Protocolo Oficial del Sprint Review (Caso Pagos Express)
+* **Demostración transparente:** Se inicia la demo con el Feature Toggle `pagos-express-v1` en **OFF (estado real actual)**.
+* **Activación controlada:** Se activa temporalmente **únicamente para el equipo o usuario de prueba** y se muestra el flujo funcional completo.
+* **Declaración Oficial del Product Owner (PO):**
+  > *"La funcionalidad está técnicamente lista y desplegada, pero todavía no la hemos liberado a usuarios reales porque necesitamos definir métricas de observación y resolver riesgos de estabilidad del pipeline. La campaña de marketing se pausará o se ajustará."*
+* **Compromiso vinculante:** **Se evita terminantemente comprometer una fecha de activación al 20% en el Sprint Review.**
+
 ---
 
 ## 🔍 14. ADAPTACIÓN DE LA SPRINT RETROSPECTIVE (TALLER 6)
@@ -404,56 +411,65 @@ La Retrospectiva deja de debatir impresiones subjetivas y pasa a inspeccionar ob
 
 | Columna | Tarjetas / Observaciones del Equipo |
 | :--- | :--- |
-| 🟢 **Lo que funcionó bien en el flujo** | • CI de GitHub Actions ejecuta Pytest y Ruff en menos de 15s.<br>• Auto-deploy a Render funciona sin intervención manual tras el merge.<br>• Integración de ConfigCat permite cambiar el comportamiento de la app en menos de 5s sin hacer deploy. |
-| 🟡 **Lo que generó fricción** | • Dependencia de aprobación externa en PRs atómicos retrasó integraciones.<br>• Falta de tablero visual de métricas de negocio para observar conversiones en tiempo real. |
-| 🔴 **Lo que rompió el flujo o generó miedo** | • Miedo a activar toggles que tocan transacciones monetarias sin observabilidad.<br>• Presencia de ramas con más de 24 horas de vida debido a tests flaky o falta de sliceado fino. |
-| 🛠️ **Acciones de Mejora Acordadas** | **1.** Implementar política estricta de cuarentena inmediata para cualquier test flaky detectado en el pipeline.<br>**2.** Definir dashboard de observabilidad previo a la creación de cualquier Feature Toggle transaccional.<br>**3.** Crear proceso de limpieza automática de Feature Toggles que superen los 14 días de vida (*Toggle Debt Removal*). |
+| 🟢 **Lo que funcionó bien en el flujo** | • CI de GitHub Actions ejecuta Pytest y Ruff en menos de 15s.<br>• Auto-deploy a Render funciona sin intervención manual tras el merge.<br>• Integración de ConfigCat permite cambiar el comportamiento de la app en menos de 5s sin hacer deploy.<br>• DoD de 3 dimensiones cumplido a nivel técnico. |
+| 🟡 **Lo que generó fricción** | • Dependencia de aprobación externa en PRs atómicos retrasó integraciones.<br>• Falta de tablero de métricas de negocio para observar conversiones en tiempo real.<br>• Solo 4 integraciones a main en el sprint. |
+| 🔴 **Lo que rompió el flujo o generó miedo** | • Presión de marketing para activar toggle un viernes sin observabilidad.<br>• Rama viva 4 días por culpa de un test flaky en CI.<br>• Fallo de health check de 11 minutos y rollback manual en deploy anterior.<br>• Deuda técnica de 3 toggles antiguos >45 días sin limpiar. |
+| 🛠️ **Acciones de Mejora Acordadas (Solución Oficial)** | **Acción 1:** Arreglar el test flaky en las próximas 24 h (máxima prioridad).<br>**Acción 2:** Crear un dashboard mínimo de métricas de pagos (errores + conversión) antes de cualquier activación.<br>**Acción 3:** Limpiar o eliminar los 3 toggles antiguos en este mismo sprint. |
 
-### 14.3. Preguntas Guía del Facilitador
-* *¿Qué nos impidió integrar más veces a main?* La falta de confianza en la suite de pruebas cuando aparecen tests inestables y la costumbre de acumular cambios grandes en lugar de hacer micro-commits.
-* *¿El auto-deploy nos dio más confianza o más miedo?* Dio confianza técnica en la automatización, pero generó miedo cuando no existen métricas de observabilidad claras para monitorear el comportamiento en producción.
-* *¿Los Feature Toggles nos ayudaron o se volvieron deuda?* Ayudaron enormemente a desacoplar el deploy del release, pero se vuelven deuda peligrosa si no tienen fecha de vencimiento y limpieza formal.
-* *¿El DoD se respetó realmente?* El DoD técnico se cumplió al 100%, pero el DoD de negocio debe exigir que no se active ningún flag sin telemetría previa.
+### 14.3. Acuerdo Vinculante del Equipo
+> 📌 **Acuerdo de Estabilidad del Pipeline:**  
+> **"No se activará ningún toggle nuevo a usuarios reales hasta que el health check no haya fallado en los últimos 7 deploys."**
 
----
-
-## 🛡️ 15. PROTOCOLO DE LIBERACIÓN SEGURA DE VALOR (SAFE RELEASE POLICY)
-
-Para evitar incidentes en producción, toda liberación mediante Feature Flags sigue un protocolo estructurado en 4 fases:
-
-```
-[FASE 0: DARK LAUNCH] ──> [FASE 1: CANARY INTERNO] ──> [FASE 2: CANARY GRADUAL] ──> [FASE 3: GENERAL RELEASE]
-   Toggle en OFF (0%)        Solo equipo / Staging        Rollout al 10% - 20%           Rollout al 100%
-   Código en producción      Validación de contratos      Monitoreo de SLAs/Métricas     Retiro de Toggle en <14d
-```
-
-### 15.1. Cuadro de Mando de Observabilidad para Liberación
-Antes de mover un Feature Toggle en ConfigCat, deben estar operativos los siguientes indicadores:
-1. **Error Rate (5xx):** Umbral máximo permitido < 0.5%.
-2. **Latencia P95:** Umbral máximo < 250 ms en los endpoints críticos.
-3. **Health Check:** Monitoreo periódico cada 30 segundos (`/health` con código HTTP 200).
-4. **Tasa de Abandono / Error de Negocio:** Disparador de alerta si se detectan anomalías funcionales.
-
-### 15.2. Criterios de Parada y Rollback Instantáneo
-* **Criterio de Éxito (100% ON):** Si tras 24 horas en FASE 2 la tasa de error es < 0.2%, la latencia se mantiene estable y la métrica de negocio es positiva, se eleva al 100% para todos los usuarios.
-* **Criterio de Rollback Instantáneo:** Si en cualquier momento tras mover el toggle el Error Rate supera el 1.5% o el health check falla, **se apaga el toggle en ConfigCat inmediatamente (tiempo de reacción < 10 segundos)** sin esperar un redespliegue de código.
+### 14.4. Preguntas Guía del Facilitador
+* *¿Qué nos impidió integrar más veces a main?* Historias demasiado grandes y bloqueo de 4 días por test flaky.
+* *¿El auto-deploy nos dio más confianza o más miedo?* Confianza técnica en la rapidez, pero miedo cuando falta observabilidad o falló el health check.
+* *¿Los Feature Toggles nos ayudaron o se volvieron deuda?* Ayudaron a desacoplar el deploy del release, pero los 3 toggles viejos demuestran acumulación de deuda técnica si no se limpian.
+* *¿El DoD se respetó realmente?* Se cumplió a nivel técnico (código en main, tests en verde, deploy a Render), pero la experiencia madura exige que el DoD de negocio impida la activación sin telemetría.
 
 ---
 
-## 💼 16. RESOLUCIÓN TÉCNICA DEL CASO DE ESTUDIO
+## 🛡️ 15. ESTRATEGIA DE LIBERACIÓN SEGURA (DECISIÓN FINAL Y PLAN ACORDADO)
+
+### 15.1. Decisión Final:
+**NO SE ACTIVA EL 20% ESTE VIERNES.**
+
+### 15.2. Plan Acordado de 5 Pasos:
+1. **Resolver test flaky + limpiar toggles viejos** (*esta semana*).
+2. **Implementar métricas básicas de error y conversión** (*máximo 3 días*).
+3. **Activar primero solo para usuarios internos / equipo** (*1-2 días de observación*).
+4. **Si todo está estable $\rightarrow$ subir al 5% $\rightarrow$ 20% con observación de 48 horas en cada paso.**
+5. **Criterio de rollback automático:** **Cualquier aumento $> 0,5\%$ en errores de pago.**
+
+```
+[PLAN DE 5 PASOS: LIBERACIÓN SEGURA]
+[Paso 1: Test Flaky + Toggles Viejos] ──> [Paso 2: Métricas Error/Conversión (3d)]
+                  │
+                  ▼
+[Paso 3: Usuarios Internos (1-2d)] ──> [Paso 4: Rollout Gradual: 5% (48h) ──> 20% (48h)]
+                  │
+                  ▼
+[Paso 5: Rollback Automático Inmediato si Error Rate > 0.5%]
+```
+
+### 15.3. Resumen de la Decisión Madura:
+> **Resumen Ejecutivo:** *Se protege la confianza del pipeline y la disciplina TBD por encima de la presión comercial de corto plazo. Se comunica con transparencia al stakeholder y se define un camino claro y seguro de liberación.*  
+>  
+> *Este caso combina presión de negocio, deuda técnica, fallos recientes de pipeline, falta de métricas y ruptura de disciplina TBD. Obliga al equipo a negociar, priorizar y aplicar todo lo aprendido en los cuatro talleres.*
+
+---
+
+## 💼 16. RESOLUCIÓN DETALLADA DE LOS 7 HECHOS PROBLEMÁTICOS
 ### *"La funcionalidad de 'Pagos Express' ya está en main, pero nadie se atreve a activarla"*
 
-A partir de los 7 hechos problemáticos identificados en el Taller 6, el equipo estableció las siguientes resoluciones y acuerdos vinculantes:
-
-| # | Hecho Problemático | Diagnóstico y Riesgo Asociado | Decisión y Plan de Acción Inmediato |
+| # | Hecho Problemático | Diagnóstico y Riesgo | Decisión Madura y Acción Concreta |
 | :-: | :--- | :--- | :--- |
-| **1** | **El PO quiere activar el toggle al 20% este viernes por presión de marketing.** | Lanzar un cambio financiero un viernes sin observabilidad viola las buenas prácticas de resiliencia y pone en riesgo los ingresos del negocio. | **Decisión: NO activar el viernes.** Se acuerda con el PO y Marketing posponer la activación al martes por la mañana (horario laboral protegido) tras completar las métricas de monitoreo durante el lunes. |
-| **2** | **El último deploy falló el health check 11 min y requirió rollback manual.** | Un auto-deploy con health check fallido indica falta de pruebas de humo o un timeout en la conexión a la base de datos durante el arranque. | **Acción:** Corregir el endpoint de `/health` para incluir timeout de 2s a MongoDB. Configurar en Render reinicio automático controlado ante fallos de inicio para evitar rollbacks manuales. |
-| **3** | **Hay 3 Feature Toggles antiguos con más de 45 días activos sin limpiar.** | Acumulación de deuda técnica de código (*Toggle Debt*), lógica condicional muerta y riesgo de efectos secundarios imprevistos. | **Acción:** Crear de inmediato 3 issues de refactorización para retirar los flags obsoletos (`cleanup-toggle-*`) en el próximo Sprint. Se establece regla estricta: ningún toggle vive más de 14 días tras llegar al 100%. |
-| **4** | **En el Sprint actual solo se lograron 4 integraciones a main.** | Incumplimiento de la regla fundamental de TBD (mínimo 1 integración diaria por desarrollador). Causa: historias demasiado grandes. | **Acción:** Aplicar la técnica de Story Slicing en todas las historias del backlog. Ninguna historia podrá tener una estimación mayor a 1 día de desarrollo. |
-| **5** | **Rama viva 4 días por un test flaky en CI.** | Los tests intermitentes destruyen la confianza del equipo en el pipeline y generan acumulación masiva de ramas. | **Acción: Política de Tolerancia Cero a Tests Flaky.** El test flaky se aisla en cuarentena inmediatamente (desactivado temporalmente con issue prioritario para corregirlo en <24h). La rama se desbloquea y fusiona. |
-| **6** | **No existe métrica clara de conversión o error de pagos.** | Volar a ciegas. Si los pagos fallan, el equipo no lo sabrá hasta recibir quejas de clientes furiosos. | **Acción Obligatoria:** Implementar telemetría con contadores de transacciones exitosas vs. fallidas antes de permitir cualquier movimiento del toggle. Esta métrica se incorpora formalmente al Definition of Ready (DoR). |
-| **7** | **Negocio anunció internamente que "Pagos Express ya está listo".** | Confusión entre "Código Desplegado (Deploy)" y "Funcionalidad Liberada (Release)". | **Acción:** Educar a los stakeholders de negocio en la distinción: *Deploy $\neq$ Release*. Un ítem solo está "Listo para el Usuario" cuando el toggle está al 100% y validado por el PO. |
+| **1** | **El PO quiere activar el toggle al 20% este viernes por presión de campaña de marketing.** | Riesgo operativo y reputacional severo al liberar pasarela de pagos sin telemetría un fin de semana. | **NO ACTIVAR EL VIERNES.** El PO frena la campaña y comunica con transparencia: *"La funcionalidad está lista técnicamente pero no liberada a usuarios reales hasta definir métricas y estabilizar el pipeline"*. |
+| **2** | **El último deploy falló el health check 11 min y requirió rollback manual.** | Pérdida de confianza en la resiliencia del auto-deploy en Render. | **ACUERDO VINCULANTE:** No se activará ningún toggle nuevo a usuarios reales hasta que el health check no haya fallado en los últimos 7 deploys. Se optimiza el health check con timeout seguro. |
+| **3** | **Hay 3 Feature Toggles antiguos con más de 45 días activos sin limpiar.** | Deuda técnica acumulada, caminos de código muertos y complejidad innecesaria. | **ACCIÓN 3 DE LA RETRO:** Limpiar o eliminar los 3 toggles antiguos en este mismo sprint. |
+| **4** | **En el sprint actual solo se lograron 4 integraciones a main.** | Ruptura de la disciplina básica de Trunk-Based Development. | **ACCIÓN:** Retomar Story Slicing estricto. Ramas efímeras con vida $< 24$ horas y micro-PRs atómicos. |
+| **5** | **Rama viva 4 días por test flaky en CI.** | Los tests intermitentes bloquean la integración continua y generan miedo. | **ACCIÓN 1 DE LA RETRO (MÁXIMA PRIORIDAD):** Arreglar el test flaky en las próximas 24 horas. |
+| **6** | **No existe ninguna métrica clara de conversión o error de pagos.** | Operación a ciegas que impide evaluar el impacto de la funcionalidad. | **ACCIÓN 2 DE LA RETRO:** Implementar dashboard mínimo de métricas de pagos (errores + conversión) en máximo 3 días antes de cualquier activación. |
+| **7** | **Negocio anunció que "Pagos Express ya está listo".** | Confusión entre "Deploy" (despliegue técnico) y "Release" (liberación comercial). | **ACCIÓN:** Educación de stakeholders. Se aclara que el código está en producción protegido por toggle pero el release comercial requiere validación previa con usuarios internos. |
 
 ---
 

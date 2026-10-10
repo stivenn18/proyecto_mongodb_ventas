@@ -19,6 +19,10 @@ def test_index_and_static_files():
     assert r_js.status_code == 200
     assert "javascript" in r_js.headers["content-type"]
 
+    r_miro = client.get("/miro")
+    assert r_miro.status_code == 200
+    assert "text/html" in r_miro.headers["content-type"]
+
 
 def test_health_check_endpoint():
     """Validar que el endpoint /health responde con status healthy para Render"""

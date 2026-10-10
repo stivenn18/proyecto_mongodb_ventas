@@ -285,6 +285,17 @@ def build_docx_taller6():
     format_table(tbl_inc, [1.6, 2.0, 1.4, 1.5], inc_headers, inc_data)
     doc.add_paragraph().paragraph_format.space_after = Pt(8)
 
+    create_styled_callout(
+        doc,
+        [
+            "1. Demostración Inicial: Se hace la demo con el toggle en OFF primero (estado real actual).",
+            "2. Activación Controlada: Luego se activa temporalmente solo para el equipo (o usuario de prueba) y se muestra el flujo.",
+            "3. Declaración de Transparencia del PO: “La funcionalidad está técnicamente lista y desplegada, pero todavía no la hemos liberado a usuarios reales porque necesitamos definir métricas de observación y resolver riesgos de estabilidad del pipeline. La campaña de marketing se pausará o se ajustará.”",
+            "4. Compromiso de Review: Se evita terminantemente comprometer una fecha de activación al 20% en el Review."
+        ],
+        title="PAUTA OFICIAL DE SPRINT REVIEW (CASO PAGOS EXPRESS)"
+    )
+
     create_screenshot_box(
         doc,
         "DEMOSTRACIÓN EN VIVO EN RENDER CON CONFIGCAT CONMUTADO",
@@ -335,19 +346,28 @@ def build_docx_taller6():
         ],
         [
             "🟡 Lo que generó fricción",
-            "• Esperar aprobaciones de PR en historias pequeñas retrasa el merge diario.\n• Ausencia de telemetría en tiempo real sobre errores funcionales al activar flags."
+            "• Esperar aprobaciones de PR en historias pequeñas retrasa el merge diario.\n• Ausencia de telemetría en tiempo real sobre errores funcionales al activar flags.\n• En el sprint actual solo se lograron 4 integraciones a main."
         ],
         [
             "🔴 Lo que rompió el flujo o generó miedo",
-            "• Temor del equipo a encender funcionalidades que tocan datos críticos sin monitoreo.\n• Ramas abiertas durante varios días por culpa de tests intermitentes (flaky tests)."
+            "• Presión comercial para activar toggle de pagos un viernes sin métricas.\n• Rama viva durante 4 días por culpa de un test flaky en CI.\n• Fallo de health check de 11 minutos y rollback manual en deploy anterior.\n• Deuda técnica de 3 toggles antiguos (>45 días) sin limpiar."
         ],
         [
-            "🛠️ Acciones de Mejora (Máximo 3 concretas)",
-            "1. POLÍTICA DE CUARENTENA: Todo test flaky detectado en CI se aísla de inmediato para desbloquear ramas.\n2. TELEMETRÍA PREVIA: Ningún toggle se mueve a producción sin dashboard de errores y latencia.\n3. POLÍTICA DE DESECHO: Todo Feature Toggle al 100% debe eliminarse del código en un plazo máximo de 14 días."
+            "🛠️ Acciones de Mejora Acordadas (Solución Oficial)",
+            "Acción 1: Arreglar el test flaky en las próximas 24 h (máxima prioridad).\nAcción 2: Crear un dashboard mínimo de métricas de pagos (errores + conversión) antes de cualquier activación.\nAcción 3: Limpiar o eliminar los 3 toggles antiguos en este mismo sprint."
         ]
     ]
     format_table(tbl_miro, [2.4, 4.1], miro_headers, miro_data)
     doc.add_paragraph().paragraph_format.space_after = Pt(8)
+
+    create_styled_callout(
+        doc,
+        [
+            "“No se activará ningún toggle nuevo a usuarios reales hasta que el health check no haya fallado en los últimos 7 deploys.”",
+            "Este acuerdo garantiza que la infraestructura y la base de datos se encuentren 100% estables antes de exponer a los clientes a nuevas funcionalidades protegidas por toggles."
+        ],
+        title="ACUERDO VINCULANTE DE ESTABILIDAD DEL PIPELINE"
+    )
 
     create_screenshot_box(
         doc,
@@ -357,48 +377,64 @@ def build_docx_taller6():
             "Columna Verde (🟢 Lo que funcionó bien en CI/CD y TBD).",
             "Columna Amarilla (🟡 Puntos de fricción identificados).",
             "Columna Roja (🔴 Factores de miedo o bloqueos de flujo).",
-            "Columna de Acciones (🛠️ Las 3 acciones de mejora concretas y asignadas)."
+            "Columna de Acciones (🛠️ Las 3 acciones de mejora concretas: test flaky 24h, dashboard métricas pagos y limpieza 3 toggles)."
         ]
     )
 
-    # 4. LIBERACIÓN SEGURA DE VALOR
-    h4 = doc.add_heading("4. PROTOCOLO DE LIBERACIÓN SEGURA DE VALOR (SAFE RELEASE)", level=1)
+    # 4. ESTRATEGIA DE LIBERACIÓN SEGURA (DECISIÓN FINAL)
+    h4 = doc.add_heading("4. ESTRATEGIA DE LIBERACIÓN SEGURA (DECISIÓN FINAL Y PLAN DE 5 PASOS)", level=1)
     h4.paragraph_format.space_before = Pt(12)
     h4.paragraph_format.space_after = Pt(6)
 
-    p = doc.add_paragraph()
-    p.add_run("Se documenta y ejercita el ciclo completo de liberación controlada mediante Feature Flags, asegurando que el equipo desacople el despliegue técnico de la activación comercial.")
+    p_dec = doc.add_paragraph()
+    r_dec_title = p_dec.add_run("Decisión Final de Liberación: ")
+    r_dec_title.bold = True
+    r_dec_val = p_dec.add_run("NO SE ACTIVA EL 20% ESTE VIERNES.\n")
+    r_dec_val.bold = True
+    r_dec_val.font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
 
-    tbl_safe = doc.add_table(rows=1, cols=4)
-    safe_headers = ["Fase de Liberación", "Audiencia Objetivo", "Métricas Supervisadas", "Criterio de Avance / Rollback"]
+    p_dec.add_run("Se protege la confianza del pipeline y la disciplina TBD por encima de la presión comercial de corto plazo. Se comunica con transparencia al stakeholder y se define un camino claro y seguro de liberación mediante el siguiente plan acordado:")
+
+    tbl_safe = doc.add_table(rows=1, cols=3)
+    safe_headers = ["Paso del Plan", "Plazo / Ventana de Observación", "Criterio Objetivo de Éxito"]
     safe_data = [
         [
-            "Fase 0: Dark Launch",
-            "0% (Oculto en Prod)",
-            "Health Check /health, compilación y despliegue en Render.",
-            "Si el build pasa y /health devuelve 200, código listo en main."
+            "1. Resolver test flaky + limpiar toggles viejos",
+            "Esta semana (primeras 24-48 horas)",
+            "Pipeline de CI 100% verde sin fallos intermitentes; código limpio de los 3 flags obsoletos."
         ],
         [
-            "Fase 1: Canary Interno",
-            "Equipo técnico y Staging",
-            "Errores en consola de navegador, latencia API < 100ms.",
-            "Validación manual de flujos sin reportar bugs durante 2 horas."
+            "2. Implementar métricas básicas de error y conversión",
+            "Máximo 3 días",
+            "Dashboard operativo con contadores de pagos exitosos, pagos fallidos y latencia P95."
         ],
         [
-            "Fase 2: Canary Progresivo",
-            "10% a 20% de Usuarios",
-            "Error Rate (5xx) < 0.5%, tasa de conversión y transacciones.",
-            "Si Error Rate > 1.5% -> Rollback inmediato en ConfigCat (<10s)."
+            "3. Activar primero solo para usuarios internos / equipo",
+            "1-2 días de observación controlada",
+            "Validación funcional en producción real por parte del equipo sin anomalías."
         ],
         [
-            "Fase 3: General Release",
-            "100% de Usuarios",
-            "Uso sostenido durante 24-48 horas, estabilidad de MongoDB Atlas.",
-            "Éxito completo. Se agenda ticket de limpieza de toggle (<14d)."
+            "4. Subir al 5% -> 20% de usuarios",
+            "Observación de 48 horas en cada paso",
+            "Transición gradual y monitoreo continuo de conversiones y estabilidad del gateway."
+        ],
+        [
+            "5. Criterio de rollback automático",
+            "Respuesta inmediata (<10 segundos)",
+            "Cualquier aumento > 0,5% en errores de pago dispara el apagado inmediato del toggle en ConfigCat."
         ]
     ]
-    format_table(tbl_safe, [1.5, 1.5, 1.8, 1.7], safe_headers, safe_data)
+    format_table(tbl_safe, [2.5, 2.0, 2.0], safe_headers, safe_data)
     doc.add_paragraph().paragraph_format.space_after = Pt(8)
+
+    create_styled_callout(
+        doc,
+        [
+            "“Se protege la confianza del pipeline y la disciplina TBD por encima de la presión comercial de corto plazo. Se comunica con transparencia al stakeholder y se define un camino claro y seguro de liberación.”",
+            "Este caso es suficientemente difícil porque combina presión de negocio, deuda técnica, fallos recientes de pipeline, falta de métricas y ruptura de disciplina TBD. Obliga al equipo a negociar, priorizar y aplicar todo lo aprendido en los cuatro talleres."
+        ],
+        title="RESUMEN DE LA DECISIÓN MADURA"
+    )
 
     create_screenshot_box(
         doc,

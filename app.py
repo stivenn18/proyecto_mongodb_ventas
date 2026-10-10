@@ -92,6 +92,15 @@ def get_script():
     raise HTTPException(status_code=404, detail="script.js not found")
 
 
+@app.get("/miro")
+def get_miro_board():
+    """Servir el tablero visual de Miro para la Retrospectiva del Taller 6"""
+    miro_path = os.path.join(os.path.dirname(__file__), "miro_taller6.html")
+    if os.path.exists(miro_path):
+        return FileResponse(miro_path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="miro_taller6.html not found")
+
+
 @app.get("/health")
 def health_check():
     """Endpoint de Health Check para Auto-deploy y monitoreo en Render"""
