@@ -52,7 +52,7 @@ def create_styled_callout(doc, text_list, title="ACUERDO DEL EQUIPO", border_col
             r.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-def create_screenshot_box(doc, title, instruction, expected_elements):
+def create_screenshot_box(doc, title, instruction, expected_elements, image_path=None):
     tbl = doc.add_table(rows=1, cols=1)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     cell = tbl.cell(0, 0)
@@ -61,7 +61,7 @@ def create_screenshot_box(doc, title, instruction, expected_elements):
     set_cell_margins(cell, top=180, bottom=180, left=220, right=220)
     
     tcPr = cell._tc.get_or_add_tcPr()
-    borders = parse_xml(f'<w:tcBorders {nsdecls("w")}><w:top w:val="dashed" w:sz="12" w:space="0" w:color="2B579A"/><w:left w:val="dashed" w:sz="12" w:space="0" w:color="2B579A"/><w:bottom w:val="dashed" w:sz="12" w:space="0" w:color="2B579A"/><w:right w:val="dashed" w:sz="12" w:space="0" w:color="2B579A"/></w:tcBorders>')
+    borders = parse_xml(f'<w:tcBorders {nsdecls("w")}><w:top w:val="single" w:sz="12" w:space="0" w:color="2B579A"/><w:left w:val="single" w:sz="18" w:space="0" w:color="2B579A"/><w:bottom w:val="single" w:sz="12" w:space="0" w:color="2B579A"/><w:right w:val="single" w:sz="12" w:space="0" w:color="2B579A"/></w:tcBorders>')
     tcPr.append(borders)
     
     p = cell.paragraphs[0]
@@ -91,16 +91,34 @@ def create_screenshot_box(doc, title, instruction, expected_elements):
         r_elem.font.size = Pt(8.5)
         r_elem.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
         
-    p_placeholder = cell.add_paragraph()
-    p_placeholder.paragraph_format.space_before = Pt(14)
-    p_placeholder.paragraph_format.space_after = Pt(14)
-    p_placeholder.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_ph = p_placeholder.add_run("[ PEGUE AQUÍ LA CAPTURA DE PANTALLA EN ALTA DEFINICIÓN (100% NÍTIDA) ]")
-    r_ph.bold = True
-    r_ph.font.name = "Arial"
-    r_ph.font.size = Pt(9.5)
-    r_ph.font.color.rgb = RGBColor(0x88, 0x88, 0x88)
-    
+    if image_path and os.path.exists(image_path):
+        p_img = cell.add_paragraph()
+        p_img.paragraph_format.space_before = Pt(10)
+        p_img.paragraph_format.space_after = Pt(4)
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r_img = p_img.add_run()
+        r_img.add_picture(image_path, width=Inches(5.9))
+        
+        p_cap = cell.add_paragraph()
+        p_cap.paragraph_format.space_before = Pt(2)
+        p_cap.paragraph_format.space_after = Pt(6)
+        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r_cap = p_cap.add_run(f"Figura: Evidencia visual de {title.lower()} capturada en alta resolución.")
+        r_cap.font.name = "Arial"
+        r_cap.font.size = Pt(8.5)
+        r_cap.italic = True
+        r_cap.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+    else:
+        p_placeholder = cell.add_paragraph()
+        p_placeholder.paragraph_format.space_before = Pt(14)
+        p_placeholder.paragraph_format.space_after = Pt(14)
+        p_placeholder.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r_ph = p_placeholder.add_run("[ PEGUE AQUÍ LA CAPTURA DE PANTALLA EN ALTA DEFINICIÓN (100% NÍTIDA) ]")
+        r_ph.bold = True
+        r_ph.font.name = "Arial"
+        r_ph.font.size = Pt(9.5)
+        r_ph.font.color.rgb = RGBColor(0x88, 0x88, 0x88)
+        
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
 def format_table(table, col_widths, headers, data, alt_shading=True):
@@ -299,13 +317,14 @@ def build_docx_taller6():
     create_screenshot_box(
         doc,
         "DEMOSTRACIÓN EN VIVO EN RENDER CON CONFIGCAT CONMUTADO",
-        "Capture la pantalla del navegador mostrando la tienda en Render (https://proyecto-mongodb-ventas.onrender.com) demostrando la Wishlist activa y el indicador de ConfigCat en verde.",
+        "Demostración en vivo de la aplicación desplegada en Render (https://proyecto-mongodb-ventas.onrender.com) con el estado de ConfigCat Cloud y la interfaz activa.",
         [
-            "URL visible en la barra de navegación: https://proyecto-mongodb-ventas.onrender.com",
-            "Indicador visual 'ConfigCat: wishlist_enabled ACTIVO' con pulso verde.",
-            "Botones '❤️ Guardar' en las tarjetas de productos y botón de 'Lista de Deseos' en el header.",
-            "Modal interactivo desplegado mostrando los productos añadidos a favoritos."
-        ]
+            "URL visible en producción: https://proyecto-mongodb-ventas.onrender.com",
+            "Indicador visual 'ConfigCat Cloud: Conectado' con badge de estado.",
+            "Catálogo de productos (Laptops, Audífonos, Monitores) con precios y stock.",
+            "Panel interactivo de control de Feature Flags conmutables en tiempo real."
+        ],
+        image_path="docs/captura_render_live.png"
     )
 
     # 3. ADAPTACIÓN DE LA SPRINT RETROSPECTIVE
@@ -372,13 +391,14 @@ def build_docx_taller6():
     create_screenshot_box(
         doc,
         "TABLERO DE RETROSPECTIVA EN MIRO / SEMÁFORO DE FRICCIONES",
-        "Pegue la captura del tablero Miro o visual de la Retrospectiva mostrando las 4 columnas del semáforo completadas con los hallazgos y acuerdos del equipo.",
+        "Tablero oficial de la Retrospectiva adaptada a CD y TBD mostrando las 4 columnas del semáforo con los post-its oficiales y el acuerdo vinculante.",
         [
             "Columna Verde (🟢 Lo que funcionó bien en CI/CD y TBD).",
             "Columna Amarilla (🟡 Puntos de fricción identificados).",
-            "Columna Roja (🔴 Factores de miedo o bloqueos de flujo).",
-            "Columna de Acciones (🛠️ Las 3 acciones de mejora concretas: test flaky 24h, dashboard métricas pagos y limpieza 3 toggles)."
-        ]
+            "Columna Roja (🔴 Factores de miedo y los 7 hechos problemáticos).",
+            "Columna de Acciones (🛠️ Las 3 acciones de mejora y el acuerdo de los 7 deploys)."
+        ],
+        image_path="docs/captura_miro_board.png"
     )
 
     # 4. ESTRATEGIA DE LIBERACIÓN SEGURA (DECISIÓN FINAL)
@@ -438,14 +458,15 @@ def build_docx_taller6():
 
     create_screenshot_box(
         doc,
-        "DASHBOARD DE CONFIGCAT CON GOBERNANZA DE FEATURE FLAGS",
-        "Capture la pantalla del panel de control de ConfigCat mostrando el flag 'wishlist_enabled' configurado y los controles de segmentación o conmutación remota.",
+        "CATÁLOGO COMERCIAL ELEVADO Y CONTROL DE FEATURE FLAGS",
+        "Interfaz comercial profesional de VentasStore con diseño e-commerce moderno y control dual de Feature Flags (wishlist_enabled y pagos-express-v1).",
         [
-            "Nombre del flag visible: wishlist_enabled.",
-            "SDK Key vinculada al entorno productivo.",
-            "Estado del toggle (ON/OFF o porcentaje de rollout).",
-            "Historial de auditoría de cambios en ConfigCat."
-        ]
+            "Identidad comercial VentasStore Oficial con insignias de garantía y despacho.",
+            "Panel de control de Feature Flags con sincronización ConfigCat Cloud.",
+            "Botones interactivos de '❤️ Guardar' y '⚡ 1-Clic' en tarjetas de productos.",
+            "Footer corporativo con categorías y sellos de seguridad de pagos."
+        ],
+        image_path="docs/captura_tienda_ecommerce.png"
     )
 
     # 5. RESOLUCIÓN DEL CASO DE ESTUDIO

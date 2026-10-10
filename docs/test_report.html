@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CI/CD Terminal Validation</title>
+  <style>
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: 'Consolas', 'Courier New', monospace;
+      padding: 30px;
+      margin: 0;
+    }
+    .terminal-window {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .terminal-header {
+      background: #21262d;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #30363d;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .terminal-title {
+      color: #8b949e;
+      font-size: 13px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .terminal-body {
+      padding: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .prompt { color: #58a6ff; font-weight: bold; }
+    .cmd { color: #f0f6fc; font-weight: bold; }
+    .success-badge {
+      background: #238636;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    .green { color: #3fb950; font-weight: bold; }
+    .cyan { color: #58a6ff; }
+    .muted { color: #8b949e; }
+  </style>
+</head>
+<body>
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="terminal-title">PowerShell &middot; GitHub Actions CI/CD Pipeline Local Runner</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="prompt">PS C:\Users\stive\Downloads\proyecto_mongodb_ventas&gt;</span> <span class="cmd">pytest tests.py -v</span></div>
+      <div class="muted">============================= test session starts =============================</div>
+      <div class="muted">platform win32 -- Python 3.11.9, pytest-8.3.3, pluggy-1.5.0</div>
+      <div class="muted">rootdir: C:\Users\stive\Downloads\proyecto_mongodb_ventas</div>
+      <div class="muted">collected 8 items</div>
+      <br>
+      <div>tests.py::test_index_and_static_files <span class="green">PASSED [ 12%]</span></div>
+      <div>tests.py::test_health_check_endpoint <span class="green">PASSED [ 25%]</span></div>
+      <div>tests.py::test_api_flags_endpoint <span class="green">PASSED [ 37%]</span></div>
+      <div>tests.py::test_pagos_express_desactivado_por_defecto <span class="green">PASSED [ 50%]</span></div>
+      <div>tests.py::test_wishlist_flag_desactivado <span class="green">PASSED [ 62%]</span></div>
+      <div>tests.py::test_wishlist_flag_activo_agregar <span class="green">PASSED [ 75%]</span></div>
+      <div>tests.py::test_wishlist_eliminar_producto <span class="green">PASSED [ 87%]</span></div>
+      <div>tests.py::test_wishlist_datos_invalidos <span class="green">PASSED [100%]</span></div>
+      <br>
+      <div class="success-badge">======================== 8 passed in 1.46s =========================</div>
+      <br><br>
+      <div><span class="prompt">PS C:\Users\stive\Downloads\proyecto_mongodb_ventas&gt;</span> <span class="cmd">ruff check .</span></div>
+      <div><span class="green">All checks passed!</span> (0 errors, 0 warnings)</div>
+    </div>
+  </div>
+</body>
+</html>
