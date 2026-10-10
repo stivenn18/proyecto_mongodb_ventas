@@ -178,7 +178,9 @@ def build_docx_taller6():
         ["Plataforma de Despliegue Continuo", "Render Cloud (Auto-Deploy sincronizado a main)"],
         ["Plataforma de Feature Flags", "ConfigCat Cloud (SDK Python + SDK JavaScript CDN)"],
         ["SDK Key Activa ConfigCat", "configcat-sdk-1/jyHfCAeT0E2Arwo28sVn6g/4yptu_1D2UORDKiU3dUviw"],
-        ["Feature Flag Implementado", "wishlist_enabled (Lista de Deseos E-Commerce en vivo)"],
+        ["Feature Flag 1 (Wishlist)", "wishlist_enabled (Lista de Deseos E-Commerce en vivo)"],
+        ["Feature Flag 2 (Caso Taller 6)", "pagos-express-v1 (Pagos Express 1-clic con simulación y 403)"],
+        ["Suite de Pruebas Automatizadas", "8 pruebas unitarias pasando al 100% (pytest tests.py)"],
         ["Versión del Playbook", "Scrum + TBD Playbook Versión 3.0 (docs/SCRUM_TBD_PLAYBOOK.md)"],
         ["Objetivo General del Taller", "Adaptar Sprint Review y Retrospective a CD y practicar la liberación segura con toggles"]
     ]

@@ -33,7 +33,17 @@ def test_api_flags_endpoint():
     """Validar consulta de Feature Flags"""
     response = client.get("/api/flags")
     assert response.status_code == 200
-    assert "wishlist_enabled" in response.json()
+    data = response.json()
+    assert "wishlist_enabled" in data
+    assert "pagos_express_v1" in data
+
+
+def test_pagos_express_desactivado_por_defecto():
+    """Caso Taller 6: Validar que pagos-express-v1 en OFF (0% rollout) bloquea la transacción con 403"""
+    payload = {"cliente_id": "CLI001", "sku": "PROD001", "monto": 4500000.0}
+    response = client.post("/api/pagos-express", json=payload)
+    assert response.status_code == 403
+    assert "deshabilitada" in response.json()["detail"]
 
 
 def test_wishlist_flag_desactivado():

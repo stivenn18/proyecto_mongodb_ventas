@@ -101,7 +101,8 @@ def health_check():
         "version": "1.0.0",
         "environment": os.getenv("ENVIRONMENT", "production"),
         "features": {
-            "wishlist_enabled": is_feature_enabled("wishlist_enabled", True)
+            "wishlist_enabled": is_feature_enabled("wishlist_enabled", True),
+            "pagos_express_v1": is_feature_enabled("pagos-express-v1", False)
         }
     }
 
@@ -111,7 +112,35 @@ def get_feature_flags():
     """Consulta el estado en vivo de los Feature Flags"""
     return {
         "wishlist_enabled": is_feature_enabled("wishlist_enabled", True),
+        "pagos_express_v1": is_feature_enabled("pagos-express-v1", False),
         "source": "ConfigCat Cloud" if configcat_client else "Local Default"
+    }
+
+
+class PagoExpressRequest(BaseModel):
+    cliente_id: str
+    sku: str
+    monto: float
+
+
+@app.post("/api/pagos-express")
+def procesar_pago_express(req: PagoExpressRequest):
+    """Caso Taller 6: Endpoint protegido por el Feature Toggle 'pagos-express-v1'"""
+    flag_active = is_feature_enabled("pagos-express-v1", False)
+    if not flag_active:
+        raise HTTPException(
+            status_code=403,
+            detail="La funcionalidad de Pagos Express (1-clic) está deshabilitada (Toggle 'pagos-express-v1' en OFF al 0%)."
+        )
+    return {
+        "status": "success",
+        "metodo": "pagos_express_1_click",
+        "transaccion_id": f"TX-EXP-{abs(hash(req.cliente_id + req.sku)) % 1000000:06d}",
+        "cliente_id": req.cliente_id,
+        "sku": req.sku,
+        "monto": req.monto,
+        "tiempo_respuesta_ms": 35,
+        "mensaje": "Pago procesado instantáneamente mediante flujo protegido por Feature Toggle."
     }
 
 

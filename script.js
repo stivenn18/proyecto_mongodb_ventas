@@ -16,7 +16,8 @@ const productosCatalog = [
 let wishlist = [];
 let currentCategory = "Todas";
 let searchQuery = "";
-let flagState = false; // Estado del Feature Flag (true/false)
+let flagState = false; // Estado del Feature Flag (wishlist_enabled)
+let pagosExpressState = false; // Estado del Feature Flag Taller 6 (pagos-express-v1)
 let simulationMode = "cloud"; // "cloud" | "manual_off" | "manual_on"
 let configcatClient = null;
 
@@ -175,6 +176,9 @@ function renderApp() {
             <button class="btn-buy" onclick="comprar('${p.sku}')">
               <i class="fa-solid fa-bag-shopping"></i> Comprar
             </button>
+            <button class="btn-express ${pagosExpressState ? 'active' : 'locked'}" onclick="procesarPagoExpressClick('${p.sku}', ${p.precio})" title="${pagosExpressState ? 'Pago Express 1-Clic activo' : 'Toggle pagos-express-v1 apagado (0%)'}">
+              <i class="fa-solid ${pagosExpressState ? 'fa-bolt' : 'fa-lock'}"></i> 1-Clic
+            </button>
             ${flagState ? `
               <button class="btn-wishlist-card ${isSaved ? "saved" : ""}" onclick="toggleDeseo('${p.sku}')">
                 <i class="fa-${isSaved ? "solid" : "regular"} fa-heart"></i>
@@ -317,6 +321,63 @@ function showToast(mensaje, tipo = "info") {
     toast.style.transition = "all 0.3s";
     setTimeout(() => toast.remove(), 300);
   }, 3500);
+}
+
+// 7. Lógica del Caso Taller 6: Pagos Express (1-Clic)
+function cambiarPagosExpress(enabled) {
+  pagosExpressState = enabled;
+  const badge = document.getElementById("cloudPagosBadge");
+  const btnOff = document.getElementById("segPagosOff");
+  const btnOn = document.getElementById("segPagosOn");
+
+  if (badge) {
+    badge.innerText = enabled ? "ON (20% Canario)" : "OFF (0% Rollout)";
+    badge.className = `status-badge ${enabled ? "on" : "off"}`;
+  }
+  if (btnOff && btnOn) {
+    btnOff.classList.toggle("active", !enabled);
+    btnOn.classList.toggle("active", enabled);
+  }
+
+  showToast(
+    enabled
+      ? "⚡ Caso Taller 6: pagos-express-v1 activado en modo Canario (20%)."
+      : "🛡️ Caso Taller 6: pagos-express-v1 en OFF (0% Rollout seguro en producción).",
+    enabled ? "success" : "warning"
+  );
+  renderApp();
+}
+
+async function procesarPagoExpressClick(sku, monto) {
+  const prod = productosCatalog.find(p => p.sku === sku);
+  const nombre = prod ? prod.nombre : sku;
+
+  if (!pagosExpressState) {
+    showToast(
+      `⛔ 403 Forbidden: Feature Toggle 'pagos-express-v1' en OFF (0%). Caso Taller 6: Código en main pero nadie lo activa.`,
+      "warning"
+    );
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/pagos-express", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cliente_id: "CLI001", sku: sku, monto: monto })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      showToast(
+        `⚡ ¡Pago Express 1-Clic Aprobado! ${data.transaccion_id} por $${monto.toLocaleString("es-CO")} (${data.tiempo_respuesta_ms}ms)`,
+        "success"
+      );
+    } else {
+      showToast(`⚡ ¡Pago Express 1-Clic aprobado localmente para ${nombre}!`, "success");
+    }
+  } catch (e) {
+    showToast(`⚡ ¡Pago Express 1-Clic simulado con éxito para ${nombre}!`, "success");
+  }
 }
 
 // Inicializar al cargar

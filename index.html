@@ -19,11 +19,11 @@
   <aside class="cloud-statusbar">
     <div class="statusbar-content">
       <span class="live-dot pulse"></span>
-      <span><strong>ConfigCat Cloud:</strong> Conectado en tiempo real</span>
+      <span><strong>ConfigCat Cloud:</strong> Conectado</span>
       <span class="divider">|</span>
-      <span><strong>Flag:</strong> <code id="flagKeyLabel">wishlist_enabled</code></span>
+      <span><strong>Flag 1:</strong> <code>wishlist_enabled</code>: <span class="status-badge" id="cloudFlagBadge">Consultando...</span></span>
       <span class="divider">|</span>
-      <span><strong>Estado Cloud:</strong> <span class="status-badge" id="cloudFlagBadge">Consultando...</span></span>
+      <span><strong>Flag 2 (Taller 6):</strong> <code>pagos-express-v1</code>: <span class="status-badge off" id="cloudPagosBadge">OFF (0%)</span></span>
     </div>
     <div class="statusbar-actions">
       <button class="btn-refresh" onclick="forzarSincronizacionCloud()" title="Forzar Sincronización">
@@ -71,7 +71,7 @@
     <section class="hero-banner">
       <div class="hero-text">
         <h2>Catálogo de Ventas Oficial &middot; Entrega Continua</h2>
-        <p>Integración de base de datos distribuida en MongoDB Atlas con Feature Toggles remotos en producción.</p>
+        <p>Integración de base de datos distribuida en MongoDB Atlas con Feature Toggles remotos en producción (Taller 3 y 6).</p>
       </div>
       <div class="hero-stats">
         <div class="stat-card">
@@ -96,7 +96,7 @@
       <div class="flag-card-header">
         <div class="flag-title">
           <i class="fa-solid fa-sliders"></i>
-          <h3>Control de Feature Flags (Demostración en Vivo)</h3>
+          <h3>Control de Feature Flags (Demostración Taller 3 & 6 en Vivo)</h3>
         </div>
         <div class="flag-mode-indicator" id="flagModeIndicator">
           <i class="fa-solid fa-cloud"></i> Modo: <strong>ConfigCat Cloud API</strong>
@@ -104,17 +104,25 @@
       </div>
 
       <p class="flag-explainer">
-        Esta funcionalidad está protegida en producción. Si cambias el interruptor en el 
-        <a href="https://app.configcat.com" target="_blank" class="link-configcat">Dashboard de ConfigCat <i class="fa-solid fa-arrow-up-right-from-square"></i></a>, 
-        la tienda habilitará o deshabilitará la lista de deseos <strong>automáticamente en tiempo real sin necesidad de redesplegar</strong>.
+        Esta aplicación desacopla el <strong>Deploy</strong> del <strong>Release</strong>. 
+        En el <a href="https://app.configcat.com" target="_blank" class="link-configcat">Dashboard de ConfigCat <i class="fa-solid fa-arrow-up-right-from-square"></i></a>, 
+        puedes conmutar en vivo sin redesplegar:
       </p>
 
-      <div class="flag-simulation-controls">
-        <span class="control-label">Simular estado localmente (o ver remoto):</span>
+      <div class="flag-simulation-controls" style="margin-bottom: 12px;">
+        <span class="control-label"><strong>Toggle 1 (Wishlist):</strong></span>
         <div class="segmented-control">
           <button class="seg-btn" id="segBtnOff" onclick="aplicarSimulacionManual(false)">🔴 Forzar OFF (0%)</button>
           <button class="seg-btn active" id="segBtnCloud" onclick="usarConfigCatCloud()">☁️ Usar ConfigCat Cloud</button>
           <button class="seg-btn" id="segBtnOn" onclick="aplicarSimulacionManual(true)">🟢 Forzar ON (100%)</button>
+        </div>
+      </div>
+
+      <div class="flag-simulation-controls">
+        <span class="control-label"><strong>Toggle 2 (Taller 6 - Pagos Express):</strong></span>
+        <div class="segmented-control">
+          <button class="seg-btn active" id="segPagosOff" onclick="cambiarPagosExpress(false)">🔴 pagos-express-v1 (OFF)</button>
+          <button class="seg-btn" id="segPagosOn" onclick="cambiarPagosExpress(true)">⚡ Activar Pagos 1-Clic (ON)</button>
         </div>
       </div>
     </section>
