@@ -1,7 +1,9 @@
-# 📖 SCRUM + TRUNK-BASED DEVELOPMENT (TBD) PLAYBOOK
-## Adaptación de Scrum a entornos de Despliegue Continuo (CD) y Trunk-Based Development
+# 📖 SCRUM + TRUNK-BASED DEVELOPMENT (TBD) PLAYBOOK (VERSIÓN 3.0)
+## Adaptación de Ceremonias Scrum a Continuous Deployment y Liberación Segura
 **Proyecto:** Sistema de Ventas con MongoDB Atlas & Python  
 **Repositorio:** `stivenn18/proyecto_mongodb_ventas`  
+**Entorno de Producción:** `https://proyecto-mongodb-ventas.onrender.com`  
+**Feature Flags:** ConfigCat SDK Cloud  
 
 
 ---
@@ -328,5 +330,145 @@ El **Definition of Done definitivo** acordado por el equipo cubre las 3 dimensio
 - [x] Suite de pruebas unitarias robusta con 100% de cobertura y `ruff linter` aprobado.
 - [x] Definition of Done (DoD) definitivo documentado y aplicado.
 - [x] Repositorio `main` protegido con Rulesets y operando bajo Trunk-Based Development real.
+
+---
+
+## 🎬 13. ADAPTACIÓN DEL SPRINT REVIEW A CONTINUOUS DEPLOYMENT (TALLER 6)
+
+### 13.1. Principios del Nuevo Review
+En un entorno con integración diaria a `main` y auto-deploy continuo, el Sprint Review deja de ser una "reunión de aprobación tardía" o un momento tenso de entrega y se transforma en una **demostración de valor real en producción (o activable)**.
+
+```
++-----------------------------------------------------------------------------------------+
+|                  COMPARATIVA: SPRINT REVIEW CLÁSICO VS. REVIEW EN CD + TBD              |
++------------------------------------+----------------------------------------------------+
+| SPRINT REVIEW CLÁSICO              | SPRINT REVIEW EN CONTINUOUS DEPLOYMENT (TBD)       |
++------------------------------------+----------------------------------------------------+
+| • Demo del incremento al final     | • Demo de lo que YA ESTÁ (o puede estar) en        |
+|   del sprint (ambiente local/QA).  |   producción real (Render).                        |
+| • Lógica de "Todo o Nada".         | • Valor incremental protegido por Feature Toggles. |
+| • Feedback tardío tras semanas     | • Feedback continuo + validación con usuarios      |
+|   de desarrollo acumulado.         |   reales y telemetría de producción.               |
+| • Enfocado en "¿Qué construimos?". | • Enfocado en "¿Qué valor recibieron los usuarios?"|
++------------------------------------+----------------------------------------------------+
+```
+
+### 13.2. Estructura Obligatoria de la Demo (Máximo 4-5 minutos por ítem)
+Cada incremento presentado durante el Review debe seguir una pauta ágil y rigurosa:
+1. **¿Qué problema de usuario resuelve?** Explicación del dolor o necesidad resuelta.
+2. **¿Está activo para todos o detrás de toggle?** Transparencia del estado del flag en ConfigCat (OFF / Canario % / 100% ON).
+3. **Demo en vivo en Render:** Verificación en el entorno productivo real activando/desactivando el Feature Flag si aplica.
+4. **Métrica o evidencia de valor:** Datos observados en telemetría o feedback de usuarios.
+5. **Pregunta al PO / Stakeholder:** *“¿Esto genera el valor esperado y estamos listos para ampliar la audiencia?”*
+
+### 13.3. Simulación Práctica del Review (Incrementos Reales del Proyecto)
+
+#### 🔹 Incremento 1: Lista de Deseos (Wishlist E-Commerce)
+* **Problema resuelto:** Los clientes necesitaban guardar productos de interés sin agregarlos de inmediato al carrito de compras.
+* **Estado del Toggle:** Protegido por el flag `wishlist_enabled` en ConfigCat Cloud.
+* **Demo en vivo:** Se muestra la tienda en Render (`https://proyecto-mongodb-ventas.onrender.com`). Con el flag en OFF, los botones de favoritos y el modal no son visibles. Se conmuta el flag a ON en vivo y el frontend actualiza la UI mostrando los botones de corazón y el contador de favoritos sin redesplegar.
+* **Pregunta clave:** *“¿La experiencia de guardado responde a la expectativa del cliente antes de iniciar la campaña de fidelización?”*
+
+#### 🔹 Incremento 2: Catálogo Dinámico con Filtros y Buscador Reactivo
+* **Problema resuelto:** Búsqueda lenta de productos por catálogo extenso. Permite filtrar instantáneamente por laptops, componentes, periféricos y monitores.
+* **Estado del Toggle:** 100% Activo para todos los usuarios.
+* **Demo en vivo:** Navegación fluida y filtrado instantáneo en la web de Render.
+* **Pregunta clave:** *“¿La categorización cubre las líneas prioritarias para la temporada de ventas?”*
+
+#### 🔹 Incremento 3: Telemetría de Flags y Monitoreo de Salud (`/health` y `/api/flags`)
+* **Problema resuelto:** Visibilidad operativa del backend y sincronización en tiempo real con ConfigCat.
+* **Estado:** 100% Activo en producción.
+* **Demo en vivo:** Consulta de `/health` devolviendo `{ "status": "healthy" }` con latencia inferior a 50 ms.
+
+---
+
+## 🔍 14. ADAPTACIÓN DE LA SPRINT RETROSPECTIVE (TALLER 6)
+
+### 14.1. Los 3 Nuevos Focos Obligatorios
+La Retrospectiva deja de debatir impresiones subjetivas y pasa a inspeccionar objetivamente el **flujo continuo de valor, la salud del pipeline y la disciplina TBD**:
+
+```
++-----------------------------------------------------------------------------------------+
+|                        LOS 3 FOCOS OBLIGATORIOS DE LA RETROSPECTIVA                     |
++----------------------------+----------------------------+-------------------------------+
+| 1. SALUD DEL PIPELINE      | 2. DISCIPLINA TBD          | 3. FLUJO DE VALOR             |
++----------------------------+----------------------------+-------------------------------+
+| • ¿Cuántas veces falló CI? | • ¿Cuántas integraciones a | • Lead Time desde commit a    |
+| • ¿Cuánto tardó el deploy? |   main logramos por día?   |   producción (< 30 min).      |
+| • ¿Hubo rollbacks o fallos | • ¿Alguna rama vivió >24h? | • ¿El valor llegó realmente   |
+|   en health checks?        | • ¿Uso limpio de Toggles?  |   al usuario final?           |
++----------------------------+----------------------------+-------------------------------+
+```
+
+### 14.2. Dinámica de Retrospectiva (Tablero Semáforo en Miro)
+
+| Columna | Tarjetas / Observaciones del Equipo |
+| :--- | :--- |
+| 🟢 **Lo que funcionó bien en el flujo** | • CI de GitHub Actions ejecuta Pytest y Ruff en menos de 15s.<br>• Auto-deploy a Render funciona sin intervención manual tras el merge.<br>• Integración de ConfigCat permite cambiar el comportamiento de la app en menos de 5s sin hacer deploy. |
+| 🟡 **Lo que generó fricción** | • Dependencia de aprobación externa en PRs atómicos retrasó integraciones.<br>• Falta de tablero visual de métricas de negocio para observar conversiones en tiempo real. |
+| 🔴 **Lo que rompió el flujo o generó miedo** | • Miedo a activar toggles que tocan transacciones monetarias sin observabilidad.<br>• Presencia de ramas con más de 24 horas de vida debido a tests flaky o falta de sliceado fino. |
+| 🛠️ **Acciones de Mejora Acordadas** | **1.** Implementar política estricta de cuarentena inmediata para cualquier test flaky detectado en el pipeline.<br>**2.** Definir dashboard de observabilidad previo a la creación de cualquier Feature Toggle transaccional.<br>**3.** Crear proceso de limpieza automática de Feature Toggles que superen los 14 días de vida (*Toggle Debt Removal*). |
+
+### 14.3. Preguntas Guía del Facilitador
+* *¿Qué nos impidió integrar más veces a main?* La falta de confianza en la suite de pruebas cuando aparecen tests inestables y la costumbre de acumular cambios grandes en lugar de hacer micro-commits.
+* *¿El auto-deploy nos dio más confianza o más miedo?* Dio confianza técnica en la automatización, pero generó miedo cuando no existen métricas de observabilidad claras para monitorear el comportamiento en producción.
+* *¿Los Feature Toggles nos ayudaron o se volvieron deuda?* Ayudaron enormemente a desacoplar el deploy del release, pero se vuelven deuda peligrosa si no tienen fecha de vencimiento y limpieza formal.
+* *¿El DoD se respetó realmente?* El DoD técnico se cumplió al 100%, pero el DoD de negocio debe exigir que no se active ningún flag sin telemetría previa.
+
+---
+
+## 🛡️ 15. PROTOCOLO DE LIBERACIÓN SEGURA DE VALOR (SAFE RELEASE POLICY)
+
+Para evitar incidentes en producción, toda liberación mediante Feature Flags sigue un protocolo estructurado en 4 fases:
+
+```
+[FASE 0: DARK LAUNCH] ──> [FASE 1: CANARY INTERNO] ──> [FASE 2: CANARY GRADUAL] ──> [FASE 3: GENERAL RELEASE]
+   Toggle en OFF (0%)        Solo equipo / Staging        Rollout al 10% - 20%           Rollout al 100%
+   Código en producción      Validación de contratos      Monitoreo de SLAs/Métricas     Retiro de Toggle en <14d
+```
+
+### 15.1. Cuadro de Mando de Observabilidad para Liberación
+Antes de mover un Feature Toggle en ConfigCat, deben estar operativos los siguientes indicadores:
+1. **Error Rate (5xx):** Umbral máximo permitido < 0.5%.
+2. **Latencia P95:** Umbral máximo < 250 ms en los endpoints críticos.
+3. **Health Check:** Monitoreo periódico cada 30 segundos (`/health` con código HTTP 200).
+4. **Tasa de Abandono / Error de Negocio:** Disparador de alerta si se detectan anomalías funcionales.
+
+### 15.2. Criterios de Parada y Rollback Instantáneo
+* **Criterio de Éxito (100% ON):** Si tras 24 horas en FASE 2 la tasa de error es < 0.2%, la latencia se mantiene estable y la métrica de negocio es positiva, se eleva al 100% para todos los usuarios.
+* **Criterio de Rollback Instantáneo:** Si en cualquier momento tras mover el toggle el Error Rate supera el 1.5% o el health check falla, **se apaga el toggle en ConfigCat inmediatamente (tiempo de reacción < 10 segundos)** sin esperar un redespliegue de código.
+
+---
+
+## 💼 16. RESOLUCIÓN TÉCNICA DEL CASO DE ESTUDIO
+### *"La funcionalidad de 'Pagos Express' ya está en main, pero nadie se atreve a activarla"*
+
+A partir de los 7 hechos problemáticos identificados en el Taller 6, el equipo estableció las siguientes resoluciones y acuerdos vinculantes:
+
+| # | Hecho Problemático | Diagnóstico y Riesgo Asociado | Decisión y Plan de Acción Inmediato |
+| :-: | :--- | :--- | :--- |
+| **1** | **El PO quiere activar el toggle al 20% este viernes por presión de marketing.** | Lanzar un cambio financiero un viernes sin observabilidad viola las buenas prácticas de resiliencia y pone en riesgo los ingresos del negocio. | **Decisión: NO activar el viernes.** Se acuerda con el PO y Marketing posponer la activación al martes por la mañana (horario laboral protegido) tras completar las métricas de monitoreo durante el lunes. |
+| **2** | **El último deploy falló el health check 11 min y requirió rollback manual.** | Un auto-deploy con health check fallido indica falta de pruebas de humo o un timeout en la conexión a la base de datos durante el arranque. | **Acción:** Corregir el endpoint de `/health` para incluir timeout de 2s a MongoDB. Configurar en Render reinicio automático controlado ante fallos de inicio para evitar rollbacks manuales. |
+| **3** | **Hay 3 Feature Toggles antiguos con más de 45 días activos sin limpiar.** | Acumulación de deuda técnica de código (*Toggle Debt*), lógica condicional muerta y riesgo de efectos secundarios imprevistos. | **Acción:** Crear de inmediato 3 issues de refactorización para retirar los flags obsoletos (`cleanup-toggle-*`) en el próximo Sprint. Se establece regla estricta: ningún toggle vive más de 14 días tras llegar al 100%. |
+| **4** | **En el Sprint actual solo se lograron 4 integraciones a main.** | Incumplimiento de la regla fundamental de TBD (mínimo 1 integración diaria por desarrollador). Causa: historias demasiado grandes. | **Acción:** Aplicar la técnica de Story Slicing en todas las historias del backlog. Ninguna historia podrá tener una estimación mayor a 1 día de desarrollo. |
+| **5** | **Rama viva 4 días por un test flaky en CI.** | Los tests intermitentes destruyen la confianza del equipo en el pipeline y generan acumulación masiva de ramas. | **Acción: Política de Tolerancia Cero a Tests Flaky.** El test flaky se aisla en cuarentena inmediatamente (desactivado temporalmente con issue prioritario para corregirlo en <24h). La rama se desbloquea y fusiona. |
+| **6** | **No existe métrica clara de conversión o error de pagos.** | Volar a ciegas. Si los pagos fallan, el equipo no lo sabrá hasta recibir quejas de clientes furiosos. | **Acción Obligatoria:** Implementar telemetría con contadores de transacciones exitosas vs. fallidas antes de permitir cualquier movimiento del toggle. Esta métrica se incorpora formalmente al Definition of Ready (DoR). |
+| **7** | **Negocio anunció internamente que "Pagos Express ya está listo".** | Confusión entre "Código Desplegado (Deploy)" y "Funcionalidad Liberada (Release)". | **Acción:** Educar a los stakeholders de negocio en la distinción: *Deploy $\neq$ Release*. Un ítem solo está "Listo para el Usuario" cuando el toggle está al 100% y validado por el PO. |
+
+---
+
+## 🎯 17. CIERRE Y COMPROMISOS DEL TALLER 6
+
+### 17.1. Checklist de Madurez en Continuous Deployment
+- [x] Sprint Review adaptado a demostraciones en producción real mediante Feature Toggles.
+- [x] Sprint Retrospective enfocada en salud de pipeline, disciplina TBD y flujo de valor.
+- [x] Práctica de liberación segura de valor documentada y probada con ConfigCat y Render.
+- [x] Políticas de contingencia, cuarentena de tests flaky y control de deuda de toggles formalizadas.
+- [x] Scrum + TBD Playbook actualizado a la **Versión 3.0**.
+
+### 17.2. Ronda Final del Equipo:
+> **"En una frase: ¿Qué cambia en nuestro próximo Review y Retro después de este taller?"**  
+> *"A partir de hoy, nuestro Sprint Review dejará de juzgar suposiciones locales para evaluar valor medible en producción con Feature Toggles, y nuestra Retrospectiva será el guardián científico de la salud de nuestro pipeline y la disciplina diaria de Trunk-Based Development."*
+
 
 
